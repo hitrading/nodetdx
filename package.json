@@ -1,0 +1,13 @@
+{
+  "name": "nodetdx",
+  "version": "1.0.0",
+  "description": "a tdx interface implemention by pure nodejs",
+  "main": "index.js",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bufferpack": "0.0.6",
+    "iconv-lite": "^0.6.2",
+    "promise-socket": "^7.0.0"
+  }
+}
