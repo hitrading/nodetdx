@@ -1,6 +1,6 @@
 {
   "name": "nodetdx",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a tdx interface implemention by pure nodejs",
   "main": "index.js",
   "author": "",
@@ -8,6 +8,6 @@
   "dependencies": {
     "bufferpack": "0.0.6",
     "iconv-lite": "^0.6.2",
-    "promise-socket": "^7.0.0"
+    "promise-socket": "^6.0.3"
   }
 }
