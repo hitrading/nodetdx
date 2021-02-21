@@ -24,28 +24,42 @@
 目前可用服务器
 --------------------
 [1] :招商证券深圳行情 (119.147.212.81:7709)
+
 [2] :上海双线主站 (101.133.214.242:7709)
 
 --------------------
 功能列表：
+
 1 : 获取股票行情
+
 2 : 获取k线
+
 3 : 获取市场股票数量
+
 4 : 获取股票列表
+
 5 : 获取指数k线
+
 6 : 查询分时行情
+
 7 : 查询历史分时行情
+
 8 : 查询分笔成交
+
 9 : 查询历史分笔成交
+
 10 : 查询公司信息目录
+
 11 : 读取公司信息详情
+
 12 : 读取除权除息信息
+
 13 : 读取财务信息
 
 
 接口API
 ---
-下面是如何在程序里面调用本接口
+下面是如何在程序里面调用本接口(这里行情数据的接口都是promise接口)
 
 首先需要引入
 
@@ -62,7 +76,7 @@ const api = new TdxMarketApi()
 之后，通常是如下的格式
 
 ```javascript
-if (api.connect('119.147.212.81', 7709)) {
+if (await api.connect('119.147.212.81', 7709)) {
     // ... same codes...
     api.disconnect()
 }
@@ -85,7 +99,7 @@ if (api.connect('119.147.212.81', 7709)) {
 
 如：
 ```javascript
-api.getSecurityQuotes([[0, '000001'], [1, '600300']])
+await api.getSecurityQuotes([[0, '000001'], [1, '600300']])
 ```
 
 #### 2 : 获取k线
@@ -114,19 +128,19 @@ K线种类
 如： 
 
 ```javascript
-api.getSecurityBars(9, 0, '000001', 0, 100)
+await api.getSecurityBars(9, 0, '000001', 0, 100)
 ```
 
 #### 3 : 获取市场股票数量
 0 - 深圳， 1 - 上海
 ```javascript
-api.getSecurityCount(0)
+await api.getSecurityCount(0)
 ```
 #### 4 : 获取股票列表
 参数：市场代码, 起始位置， 数量  如： 0,0 或 1,100
 
 ```javascript
-api.getSecurityList(1, 0)
+await api.getSecurityList(1, 0)
 ```
 
 #### 5 : 获取指数k线
@@ -154,17 +168,17 @@ K线种类
 如： 
 
 ```javascript
-api.getIndexBars(9,1, '000001', 1, 2)
+await api.getIndexBars(9,1, '000001', 1, 2)
 ```
 #### 6 : 查询分时行情
 参数：市场代码， 股票代码， 如： 0,000001 或 1,600300
 ```javascript
-api.getMinuteTimeData(1, '600300')
+await api.getMinuteTimeData(1, '600300')
 ```
 #### 7 : 查询历史分时行情
 参数：市场代码， 股票代码，时间 如： 0,000001,20161209 或 1,600300,20161209
 ```javascript
-api.getHistoryMinuteTimeData(MARKET_SH, '600300', 20161209)
+await api.getHistoryMinuteTimeData(MARKET_SH, '600300', 20161209)
 ```
 
 注意，我们可以使用 MARKET_SH , MARKET_SZ 常量来代替 1 和 0 作为参数
@@ -173,7 +187,7 @@ api.getHistoryMinuteTimeData(MARKET_SH, '600300', 20161209)
 
 参数：市场代码， 股票代码，起始位置， 数量 如： 0,000001,0,10
 ```javascript
-api.getTransactionData(MARKET_SZ, '000001', 0, 30)
+await api.getTransactionData(MARKET_SZ, '000001', 0, 30)
 ```
 
 #### 9 : 查询历史分笔成交
@@ -181,19 +195,19 @@ api.getTransactionData(MARKET_SZ, '000001', 0, 30)
 参数：市场代码， 股票代码，起始位置，日期 数量 如： 0,000001,0,10,20170209
 
 ```javascript
-api.getHistoryTransactionData(MARKET_SZ, '000001', 0, 10, 20170209)
+await api.getHistoryTransactionData(MARKET_SZ, '000001', 0, 10, 20170209)
 ```
 #### 10 : 查询公司信息目录
 参数：市场代码， 股票代码， 如： 0,000001 或 1,600300
 ```javascript
-api.getCompanyInfoCategory(MARKET_SZ, '000001')
+await api.getCompanyInfoCategory(MARKET_SZ, '000001')
 ```
 
 #### 11 : 读取公司信息详情
 
 参数：市场代码， 股票代码, 文件名, 起始位置， 数量, 如：0,000001,000001.txt,2054363,9221
 ```javascript
-api.getCompanyInfoContent(0, '000001', '000001.txt', 0, 10000)
+await api.getCompanyInfoContent(0, '000001', '000001.txt', 0, 10000)
 ```
 
 注意这里的 起始位置， 数量 参考上面接口的返回结果。
@@ -201,16 +215,17 @@ api.getCompanyInfoContent(0, '000001', '000001.txt', 0, 10000)
 #### 12 : 读取除权除息信息
 参数：市场代码， 股票代码， 如： 0,000001 或 1,600300
 ```javascript
-api.getExRightInfo(1, '600300')
+await api.getExRightInfo(1, '600300')
 ```
 
 #### 13 : 读取财务信息
 参数：市场代码， 股票代码， 如： 0,000001 或 1,600300
 ```javascript
-api.getFinanceInfo(0, '000001')
+await api.getFinanceInfo(0, '000001')
 ```
 
 ## 其它
 
 本项目fork自[https://github.com/rainx/pytdx](https://github.com/rainx/pytdx)，在pytdx基础上修改而来，并修复了一些bug
+
 在此感谢pytdx的作者[RainX](https://github.com/rainx)
