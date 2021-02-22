@@ -64,44 +64,44 @@ class GetIndexBarsCmd extends BaseParser {
   }
 
   parseResponse(bodyBuf) {
-    var pos = 0
+    let pos = 0;
 
-    const [count] = bufferpack.unpack('<H', bodyBuf.slice(0, 2))
-    pos += 2
+    const [count] = bufferpack.unpack('<H', bodyBuf.slice(0, 2));
+    pos += 2;
 
-    const klines = []
+    const klines = [];
 
-    let preDiffBase = 0
+    let preDiffBase = 0;
 
     for (let i = 0; i < count; i++) {
-      var [year, month, day, hour, minute, pos] = getDatetime(this.category, bodyBuf, pos)
+      let year, month, day, hour, minute, priceOpenDiff, priceCloseDiff, priceHighDiff, priceLowDiff;
+      // console.log(pos)
+      [year, month, day, hour, minute, pos] = getDatetime(this.category, bodyBuf, pos);
+      [priceOpenDiff, pos] = getPrice(bodyBuf, pos);
+      [priceCloseDiff, pos] = getPrice(bodyBuf, pos);
+      [priceHighDiff, pos] = getPrice(bodyBuf, pos);
+      [priceLowDiff, pos] = getPrice(bodyBuf, pos);
+      
+      const [volRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4));
+      const vol = getVolume(volRaw);
 
-      var [priceOpenDiff, pos] = getPrice(bodyBuf, pos)
-      var [priceCloseDiff, pos] = getPrice(bodyBuf, pos)
+      pos += 4;
+      const [dbvolRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4));
+      const dbvol = getVolume(dbvolRaw);
+      pos += 4;
 
-      var [priceHighDiff, pos] = getPrice(bodyBuf, pos)
-      var [priceLowDiff, pos] = getPrice(bodyBuf, pos)
+      const [upCount, downCount] = bufferpack.unpack('<HH', bodyBuf.slice(pos, pos + 4));
+      pos += 4;
 
-      const [volRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4))
-      const vol = getVolume(volRaw)
+      const open = this.calcPrice(priceOpenDiff, preDiffBase);
 
-      pos += 4
-      const [dbvolRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4))
-      const dbvol = getVolume(dbvolRaw)
-      pos += 4
+      priceOpenDiff += preDiffBase;
 
-      const [upCount, downCount] = bufferpack.unpack('<HH', bodyBuf.slice(pos, pos + 4))
-      pos += 4
+      const close = this.calcPrice(priceOpenDiff, priceCloseDiff);
+      const high = this.calcPrice(priceOpenDiff, priceHighDiff);
+      const low = this.calcPrice(priceOpenDiff, priceLowDiff);
 
-      const open = this.calcPrice(priceOpenDiff, preDiffBase)
-
-      priceOpenDiff = priceOpenDiff + preDiffBase
-
-      const close = this.calcPrice(priceOpenDiff, priceCloseDiff)
-      const high = this.calcPrice(priceOpenDiff, priceHighDiff)
-      const low = this.calcPrice(priceOpenDiff, priceLowDiff)
-
-      preDiffBase = priceOpenDiff + priceCloseDiff
+      preDiffBase = priceOpenDiff + priceCloseDiff;
 
       klines.push({
         open,

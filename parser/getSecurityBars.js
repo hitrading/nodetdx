@@ -55,40 +55,41 @@ class GetSecurityBarsCmd extends BaseParser {
   }
 
   parseResponse(bodyBuf) {
-    var pos = 0
+    let pos = 0;
 
     const [count] = bufferpack.unpack('<H', bodyBuf.slice(0, 2));
-    pos += 2
+    pos += 2;
 
-    const klines = []
+    const klines = [];
 
-    let preDiffBase = 0
+    let preDiffBase = 0;
 
     for (let i = 0; i < count; i++) {
-      var [year, month, day, hour, minute, pos] = getDatetime(this.category, bodyBuf, pos);
-      var [priceOpenDiff, pos] = getPrice(bodyBuf, pos)
-      var [priceCloseDiff, pos] = getPrice(bodyBuf, pos)
+      let year, month, day, hour, minute, priceOpenDiff, priceCloseDiff, priceHighDiff, priceLowDiff;
+      [year, month, day, hour, minute, pos] = getDatetime(this.category, bodyBuf, pos);
+      [priceOpenDiff, pos] = getPrice(bodyBuf, pos);
+      [priceCloseDiff, pos] = getPrice(bodyBuf, pos);
 
-      var [priceHighDiff, pos] = getPrice(bodyBuf, pos)
-      var [priceLowDiff, pos] = getPrice(bodyBuf, pos)
+      [priceHighDiff, pos] = getPrice(bodyBuf, pos);
+      [priceLowDiff, pos] = getPrice(bodyBuf, pos);
 
-      const [volRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4))
-      const vol = getVolume(volRaw)
+      const [volRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4));
+      const vol = getVolume(volRaw);
 
-      pos += 4
-      const [dbvolRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4))
-      const dbvol = getVolume(dbvolRaw)
-      pos += 4
+      pos += 4;
+      const [dbvolRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4));
+      const dbvol = getVolume(dbvolRaw);
+      pos += 4;
 
-      const open = this.calcPrice(priceOpenDiff, preDiffBase)
+      const open = this.calcPrice(priceOpenDiff, preDiffBase);
 
-      priceOpenDiff += preDiffBase
+      priceOpenDiff += preDiffBase;
 
-      const close = this.calcPrice(priceOpenDiff, priceCloseDiff)
-      const high = this.calcPrice(priceOpenDiff, priceHighDiff)
-      const low = this.calcPrice(priceOpenDiff, priceLowDiff)
+      const close = this.calcPrice(priceOpenDiff, priceCloseDiff);
+      const high = this.calcPrice(priceOpenDiff, priceHighDiff);
+      const low = this.calcPrice(priceOpenDiff, priceLowDiff);
 
-      preDiffBase = priceOpenDiff + priceCloseDiff
+      preDiffBase = priceOpenDiff + priceCloseDiff;
 
       klines.push({
         open,
@@ -106,7 +107,7 @@ class GetSecurityBarsCmd extends BaseParser {
       });
     }
         
-    return klines
+    return klines;
   }
 
   setup() {}

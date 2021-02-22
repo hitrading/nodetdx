@@ -56,17 +56,18 @@ class GetMinuteTimeData extends BaseParser {
   // Out[40]: (0, 18)
 
   parseResponse(bodyBuf) {
-    var pos = 0
+    let pos = 0;
     const [num] = bufferpack.unpack('<H', bodyBuf.slice(pos, pos + 2));
-    let lastPrice = 0
-    pos += 4
-    const prices = []
+    let lastPrice = 0;
+    pos += 4;
+    const prices = [];
 
     for (let i = 0; i < num; i++) {
-      var [priceRaw, pos] = getPrice(bodyBuf, pos)
-      var [reversed1, pos] = getPrice(bodyBuf, pos)
-      var [vol, pos] = getPrice(bodyBuf, pos)
-      lastPrice += priceRaw
+      let priceRaw, reversed1, vol;
+      [priceRaw, pos] = getPrice(bodyBuf, pos);
+      [reversed1, pos] = getPrice(bodyBuf, pos);
+      [vol, pos] = getPrice(bodyBuf, pos);
+      lastPrice += priceRaw;
 
       prices.push({
         price: lastPrice / 100,
@@ -74,7 +75,7 @@ class GetMinuteTimeData extends BaseParser {
       });
     }
 
-    return prices
+    return prices;
   }
 
   setup() {}

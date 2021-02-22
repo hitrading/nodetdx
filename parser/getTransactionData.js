@@ -21,7 +21,7 @@ class GetTransactionData extends BaseParser {
   }
 
   parseResponse(bodyBuf) {
-    var pos = 0;
+    let pos = 0;
     const [count] = bufferpack.unpack('<H', bodyBuf.slice(pos, pos + 2));
     pos += 2;
 
@@ -33,12 +33,13 @@ class GetTransactionData extends BaseParser {
       // ??? get_time
       // \x80\x03 = 14:56
       // console.log('bodyBuf.length, pos', i, bodyBuf.length, pos)
-      var [ hour, minute, pos ] = getTime(bodyBuf, pos);
-      var [ priceRaw, pos ] = getPrice(bodyBuf, pos);
-      var [ vol, pos ] = getPrice(bodyBuf, pos);
-      var [ num, pos ] = getPrice(bodyBuf, pos);
-      var [ buyOrSell, pos ] = getPrice(bodyBuf, pos);
-      var [ _, pos ] = getPrice(bodyBuf, pos);
+      let hour, minute, priceRaw, vol, num, buyOrSell;
+      [ hour, minute, pos ] = getTime(bodyBuf, pos);
+      [ priceRaw, pos ] = getPrice(bodyBuf, pos);
+      [ vol, pos ] = getPrice(bodyBuf, pos);
+      [ num, pos ] = getPrice(bodyBuf, pos);
+      [ buyOrSell, pos ] = getPrice(bodyBuf, pos);
+      [ , pos ] = getPrice(bodyBuf, pos);
 
       lastPrice += priceRaw;
 

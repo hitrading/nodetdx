@@ -23,7 +23,7 @@ class GetCompanyInfoContent extends BaseParser {
 
   parseResponse(bodyBuf) {
     let pos = 0;
-    const [ _, length ] = bufferpack.unpack('<10sH', bodyBuf.slice(0, 12)); // _, length = struct.unpack(u'<10sH', bodyBuf[:12])
+    const [ , length ] = bufferpack.unpack('<10sH', bodyBuf.slice(0, 12)); // _, length = struct.unpack(u'<10sH', bodyBuf[:12])
     pos += 12;
     const content = bodyBuf.slice(pos, pos + length);
     return this.decode(content, 'gbk'); // content.decode('GBK', 'ignore')

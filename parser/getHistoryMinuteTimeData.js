@@ -28,16 +28,17 @@ class GetHistoryMinuteTimeData extends BaseParser {
   }
 
   parseResponse(bodyBuf) {
-    var pos = 0;
+    let pos = 0;
     const [num] = bufferpack.unpack('<H', bodyBuf.slice(pos, pos + 2)); // (num, ) = struct.unpack("<H", bodyBuf[:2])
     let lastPrice = 0;
     // 跳过了4个字节，实在不知道是什么意思
     pos += 6;
     const prices = [];
     for (let i = 0; i < num; i++) {
-      var [ priceRaw, pos ] = getPrice(bodyBuf, pos);
-      var [ reversed1, pos ] = getPrice(bodyBuf, pos);
-      var [ vol, pos ] = getPrice(bodyBuf, pos);
+      let priceRaw, reversed1, vol;
+      [ priceRaw, pos ] = getPrice(bodyBuf, pos);
+      [ reversed1, pos ] = getPrice(bodyBuf, pos);
+      [ vol, pos ] = getPrice(bodyBuf, pos);
       lastPrice += priceRaw;
 
       prices.push({

@@ -14,7 +14,7 @@ class ResponseHeaderRecvFails extends Error {}
 class ResponseRecvFails extends Error {}
 class MethodNotImplemented extends Error {}
 
-const RSP_HEADER_LEN = 0x10
+const RSP_HEADER_LEN = 0x10;
 
 let totalSended = 0;
 class BaseParser {
@@ -47,12 +47,12 @@ class BaseParser {
     await this.client.writeAll(this.sendPkg);
 
     let nSended = this.client.socket.bytesWritten; // bytesRead
-    logger.debug('raw nSended', nSended)
+    logger.debug('raw nSended', nSended);
     const nRawSended = nSended;
     nSended = nSended - totalSended;
-    totalSended = nRawSended
+    totalSended = nRawSended;
 
-    logger.debug('nSended', nSended, this.sendPkg.length)
+    logger.debug('nSended', nSended, this.sendPkg.length);
 
     // logger.debug('send package:', this.sendPkg);
 
