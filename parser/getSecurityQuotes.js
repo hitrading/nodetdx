@@ -39,12 +39,12 @@ class GetSecurityQuotesCmd extends BaseParser {
     let pkgArr = bufferToBytes(pkg_header);
 
     stocks.forEach(([market, code]) => {
-      if (typeof code === 'string') {
+      // if (typeof code === 'string') {
         // code = this.decode(code, 'utf-8');
         // console.log('[market, code]', market, code)
-        const oneStockPkg = bufferpack.pack('<B6s', [market, code]);
-        pkgArr = pkgArr.concat(bufferToBytes(oneStockPkg));
-      }
+      const oneStockPkg = bufferpack.pack('<B6s', [market, code]);
+      pkgArr = pkgArr.concat(bufferToBytes(oneStockPkg));
+      // }
     });
 
     this.sendPkg = bytesToBuffer(pkgArr);
@@ -54,14 +54,14 @@ class GetSecurityQuotesCmd extends BaseParser {
     var pos = 0;
     pos += 2; // skip b1 cb
     const [numStock] = bufferpack.unpack('<H', bodyBuf.slice(pos, pos + 2));
-    // pos += 2;
+    pos += 2;
 
-    const startPosList = this.calcStartPosForEveryStock(bodyBuf);
+    // const startPosList = this.calcStartPosForEveryStock(bodyBuf);
 
     const stocks = [];
 
     for (let i = 0; i < numStock; i++) {
-      pos = startPosList[i];
+      // pos = startPosList[i];
       // print (bodyBuf.slice(pos))
       // b'\x00000001\x95\n\x87\x0e\x01\x01\x05\x00\xb1\xb9\xd6\r\xc7\x0e\x8d\xd7\x1a\x84\x04S\x9c<M\xb6\xc8\x0e\x97\x8e\x0c\x00\xae\n\x00\x01\xa0\x1e\x9e\xb3\x03A\x02\x84\xf9\x01\xa8|B\x03\x8c\xd6\x01\xb0lC\x04\xb7\xdb\x02\xac\x7fD\x05\xbb\xb0\x01\xbe\xa0\x01y\x08\x01GC\x04\x00\x00\x95\n'
       const [market, code, active1] = bufferpack.unpack('<B6sH', bodyBuf.slice(pos, pos + 9));
@@ -72,16 +72,16 @@ class GetSecurityQuotesCmd extends BaseParser {
       var [highDiff, pos] = getPrice(bodyBuf, pos);
       var [lowDiff, pos] = getPrice(bodyBuf, pos);
       // 不确定这里应该是用 getPrice 跳过还是直接跳过4个bytes
-      var reversedBytes0 = bodyBuf.slice(pos, pos + 4);
+      // var reversedBytes0 = bodyBuf.slice(pos, pos + 4);
       // console.log('reversedBytes0', reversedBytes0)
-      pos += 4
-      // var [reversedBytes0, pos] = getPrice(bodyBuf, pos);
+      // pos += 4
+      var [reversedBytes0, pos] = getPrice(bodyBuf, pos);
       // 应该是 -price
       var [reversedBytes1, pos] = getPrice(bodyBuf, pos);
       // console.log(reversedBytes1 == -price)
-      if (reversedBytes1 !== -price) {
-        throw new Error(`Check Error 'reversedBytes1 !== -price' (${reversedBytes1} !== -${price})`)
-      }
+      // if (reversedBytes1 !== -price) {
+      //   throw new Error(`Check Error 'reversedBytes1 !== -price' (${reversedBytes1} !== -${price})`)
+      // }
       // else {
       //   console.log(`${reversedBytes1} !== -${price}`)
       // }
@@ -120,17 +120,24 @@ class GetSecurityQuotesCmd extends BaseParser {
       var [bidVol5, pos] = getPrice(bodyBuf, pos);
       var [askVol5, pos] = getPrice(bodyBuf, pos);
 
-      var [
-        reversedBytes4, reversedBytes5, reversedBytes6,
-        reversedBytes7, reversedBytes8, reversedBytes9,
-        active2
-      ] = bufferpack.unpack('<HbbbbHH', bodyBuf.slice(pos, pos + 10));
+      // var [
+      //   reversedBytes4, reversedBytes5, reversedBytes6,
+      //   reversedBytes7, reversedBytes8, reversedBytes9,
+      //   active2
+      // ] = bufferpack.unpack('<HbbbbHH', bodyBuf.slice(pos, pos + 10));
 
       // pos += 10 // TODO: 处理同时查询多只股票解析响应数据异常的问题
 
       // console.log('bodyBuf[%d][%d]', pos,pos+1, bodyBuf[pos], bodyBuf[pos+1])
       
-      // pos += i % 2
+      var [reversedBytes4] = bufferpack.unpack('<H', bodyBuf.slice(pos, pos+2))
+      pos += 2
+      var [reversedBytes5, pos] = getPrice(bodyBuf, pos)
+      var [reversedBytes6, pos] = getPrice(bodyBuf, pos)
+      var [reversedBytes7, pos] = getPrice(bodyBuf, pos)
+      var [reversedBytes8, pos] = getPrice(bodyBuf, pos)
+      var [reversedBytes9, active2] = bufferpack.unpack('<hH', bodyBuf.slice(pos, pos + 4))
+      pos += 4
 
       stocks.push({
         market,
@@ -142,7 +149,8 @@ class GetSecurityQuotesCmd extends BaseParser {
         open: this.calcPrice(price, openDiff),
         high: this.calcPrice(price, highDiff),
         low: this.calcPrice(price, lowDiff),
-        reversedBytes0: bytesToBuffer(reversedBytes0).readUInt32LE(0), // readUInt32BE
+        serverTime: this.formatTime(reversedBytes0),
+        reversedBytes0, // : bytesToBuffer(reversedBytes0).readUInt32LE(0), // readUInt32BE
         reversedBytes1,
         vol,
         curVol,
@@ -176,7 +184,7 @@ class GetSecurityQuotesCmd extends BaseParser {
         reversedBytes6,
         reversedBytes7,
         reversedBytes8,
-        reversedBytes9,
+        reversedBytes9: reversedBytes9 / 100, // 涨速
         active2
       });
     }
@@ -204,6 +212,38 @@ class GetSecurityQuotesCmd extends BaseParser {
     });
 
     return arr;
+  }
+
+  /**
+   * format time from reversedBytes0
+   * by using method from https://github.com/rainx/pytdx/issues/187
+   * @param {*} timestamp 
+   */
+  formatTime(timestamp) {
+    timestamp = '' + timestamp;
+    // console.log(typeof timestamp, timestamp)
+    let time = timestamp.slice(0, -6) + ':';
+    const s = timestamp.slice(-6, -4);
+    if (+s < 60) {
+        time += s + ':';
+        let n = Number(timestamp.slice(-4)) * 60 / 10000;
+        let sn = n.toFixed(3);
+        if (n < 10) {
+          sn = '0' + sn;
+        }
+        time += sn;
+    }
+    else {
+      time += (Number(timestamp.slice(-6)) * 60 / 1000000).toFixed(0) + ':';
+      let n = (Number(timestamp.slice(-6)) * 60 % 1000000) * 60 / 1000000;
+      let sn = n.toFixed(3);
+      if (n < 10) {
+        sn = '0' + sn;
+      }
+      time += sn;
+    }
+
+    return time
   }
 }
 

@@ -82,7 +82,7 @@ class GetSecurityBarsCmd extends BaseParser {
 
       const open = this.calcPrice(priceOpenDiff, preDiffBase)
 
-      priceOpenDiff = priceOpenDiff + preDiffBase
+      priceOpenDiff += preDiffBase
 
       const close = this.calcPrice(priceOpenDiff, priceCloseDiff)
       const high = this.calcPrice(priceOpenDiff, priceHighDiff)

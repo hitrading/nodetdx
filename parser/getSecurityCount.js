@@ -43,8 +43,8 @@ class GetSecurityCountCmd extends BaseParser {
   }
 
   parseResponse(bodyBuf) {
-    const [count] = bufferpack.unpack('<H', bodyBuf.slice(0, 2));
-    return count;
+    const [num] = bufferpack.unpack('<H', bodyBuf.slice(0, 2));
+    return num;
   }
 
   setup() {}

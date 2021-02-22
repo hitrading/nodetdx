@@ -44,7 +44,7 @@ class BaseParser {
 
     logger.debug('send package:', this.sendPkg);
 
-    await this.client.write(this.sendPkg);
+    await this.client.writeAll(this.sendPkg);
 
     let nSended = this.client.socket.bytesWritten; // bytesRead
     logger.debug('raw nSended', nSended)
@@ -100,7 +100,7 @@ class BaseParser {
           bodyBuf = unzipedData;
         }
 
-        // logger.debug('recv body ', JSON.stringify(bodyBuf, 2, null));
+        logger.debug('recv body ', JSON.stringify(bodyBuf));
 
         return this.parseResponse(bodyBuf);
       }

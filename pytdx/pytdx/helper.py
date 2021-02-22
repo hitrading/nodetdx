@@ -45,10 +45,10 @@ def get_volume(ivol):
     dbl_2 = 2.0
     dbl_128 = 128.0
 
-    dwEcx = logpoint * 2 - 0x7f;
-    dwEdx = logpoint * 2 - 0x86;
-    dwEsi = logpoint * 2 - 0x8e;
-    dwEax = logpoint * 2 - 0x96;
+    dwEcx = logpoint * 2 - 0x7f
+    dwEdx = logpoint * 2 - 0x86
+    dwEsi = logpoint * 2 - 0x8e
+    dwEax = logpoint * 2 - 0x96
     if dwEcx < 0:
         tmpEax = - dwEcx
     else:
@@ -104,7 +104,7 @@ def get_datetime(category, buffer, pos):
     else:
         (zipday,) = struct.unpack("<I", buffer[pos: pos + 4])
 
-        year = int(zipday / 10000);
+        year = int(zipday / 10000)
         month = int((zipday % 10000) / 100)
         day = zipday % 100
 

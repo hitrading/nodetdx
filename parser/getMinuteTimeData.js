@@ -66,7 +66,7 @@ class GetMinuteTimeData extends BaseParser {
       var [priceRaw, pos] = getPrice(bodyBuf, pos)
       var [reversed1, pos] = getPrice(bodyBuf, pos)
       var [vol, pos] = getPrice(bodyBuf, pos)
-      lastPrice = lastPrice + priceRaw
+      lastPrice += priceRaw
 
       prices.push({
         price: lastPrice / 100,

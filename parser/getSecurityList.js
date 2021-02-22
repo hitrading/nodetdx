@@ -29,16 +29,17 @@ class GetSecurityList extends BaseParser {
       // b'880023d\x00\xd6\xd0\xd0\xa1\xc6\xbd\xbe\xf9.9\x04\x00\x02\x9a\x99\x8cA\x00\x00\x00\x00'
       // 880023 100 中小平均 276782 2 17.575001 0 80846648
       const oneBytes = bodyBuf.slice(pos, pos + 29);
-      let [code, volunit, nameBytes, reversedBytes1, preCloseRaw, reversedBytes2] = bufferpack.unpack('<6sH8s5sI4s', oneBytes);
+      let [code, volunit, nameBytes, reversedBytes1, decimalPoint, preCloseRaw, reversedBytes2] = bufferpack.unpack('<6sH8s4sBI4s', oneBytes);
 
       // code = this.decode(code, 'utf-8');
-      const name = this.decode(nameBytes, 'gbk'); // nameBytes.decode('gbk');
+      const name = this.decode(nameBytes, 'gbk'); // name = name_bytes.decode("gbk").rstrip("\x00")
       const preClose = getVolume(preCloseRaw);
       pos += 29;
       
       stocks.push({
         code,
         volunit,
+        decimalPoint,
         name,
         preClose
       });

@@ -1,5 +1,6 @@
-const { TdxMarketApi } = require('../index');
+const { TdxMarketApi, enableDebug } = require('../index');
 
+// enableDebug();
 const api = new TdxMarketApi();
 
 // ['招商证券深圳行情', '119.147.212.81:7709']
@@ -13,8 +14,8 @@ const api = new TdxMarketApi();
     // console.log('1 api.getSecurityCount', num)
     // const list = await api.getSecurityList(0, 0);
     // console.log(list);
-    // const quotes = await api.getSecurityQuotes([[0, '000001'], [1, '600300'],  [0,'000002'], [0,'000008'], [0,'000011'], [0,'000012'], [0,'000014'], [0,'000016'], [0,'000017'], [0, '002351'], [1, '600520']]);  // 84, 165, 246
-    // console.log(quotes)
+    const quotes = await api.getSecurityQuotes([[0, '000001'], [1, '600300'],  [0,'000002'], [0,'000008'], [0,'000011'], [0,'000012'], [0,'000014'], [0,'000016'], [0,'000017'], [0, '002351'], [1, '600520']]);  // 84, 165, 246
+    console.log(quotes)
     // const financeInfo = await api.getFinanceInfo(0, '000001');
     // console.log(financeInfo);
     // const exRightInfo = await api.getExRightInfo(0, '000001');
@@ -33,7 +34,7 @@ const api = new TdxMarketApi();
     // console.log(transData)
     // const companyCategory = await api.getCompanyInfoCategory(0, '000001');
     // console.log(companyCategory)
-    const companyInfo = await api.getCompanyInfoContent(0, '000001', '000001.txt', 0, 20000);
-    console.log(companyInfo);
+    // const companyInfo = await api.getCompanyInfoContent(0, '000001', '000001.txt', 0, 1000);
+    // console.log(companyInfo);
   }
 })()

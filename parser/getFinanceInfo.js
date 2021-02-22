@@ -34,6 +34,11 @@ class GetFinanceInfo extends BaseParser {
     const pkgParam = bufferpack.pack('<B6s', [market, code]);
     pkgArr = pkgArr.concat(bufferToBytes(pkgParam)); // pkg.extend(struct.pack(u"<B6s", market, code))
     this.sendPkg = bytesToBuffer(pkgArr);
+    // pkg = Buffer.from('0c4d109c000168006800d002010036303131363602003630313136362e74787400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007499ae470000697f000000000000', 'hex')
+    // pkg = Buffer.from('0c4e109c000168006800d002010036303131363602003630313136362e74787400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007499aebf00006907000000000000', 'hex')
+    // pkg = Buffer.from('0c51109c000168006800d002010036303131323802003630313132382e74787400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007499bc5100005797000000000000', 'hex')
+    // pkg = Buffer.from('0c52109c000168006800d002010036303131323802003630313132382e74787400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007499bcc90000571f000000000000', 'hex')
+
   }
 
   parseResponse(bodyBuf) {
@@ -77,45 +82,45 @@ class GetFinanceInfo extends BaseParser {
       weifenlirun,
       baoliu1,
       baoliu2
-     ] = bufferpack.unpack("<IHHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII", bodyBuf.slice(pos));
+     ] = bufferpack.unpack("<fHHIIffffffffffffffffffffffffffffff", bodyBuf.slice(pos));
 
     return {
       market,
       code,
-      liutongguben: this.getV(liutongguben),
+      liutongguben: this.getV(liutongguben) * 10000,
       province,
       industry,
       updatedDate,
       ipoDate,
-      zongguben: this.getV(zongguben),
-      guojiagu: this.getV(guojiagu),
-      faqirenfarengu: this.getV(faqirenfarengu),
-      farengu: this.getV(farengu),
-      bgu: this.getV(bgu),
-      hgu: this.getV(hgu),
-      zhigonggu: this.getV(zhigonggu),
-      zongzichan: this.getV(zongzichan),
-      liudongzichan: this.getV(liudongzichan),
-      gudingzichan: this.getV(gudingzichan),
-      wuxingzichan: this.getV(wuxingzichan),
+      zongguben: this.getV(zongguben) * 10000,
+      guojiagu: this.getV(guojiagu) * 10000,
+      faqirenfarengu: this.getV(faqirenfarengu) * 10000,
+      farengu: this.getV(farengu) * 10000,
+      bgu: this.getV(bgu) * 10000,
+      hgu: this.getV(hgu) * 10000,
+      zhigonggu: this.getV(zhigonggu) * 10000,
+      zongzichan: this.getV(zongzichan) * 10000,
+      liudongzichan: this.getV(liudongzichan) * 10000,
+      gudingzichan: this.getV(gudingzichan) * 10000,
+      wuxingzichan: this.getV(wuxingzichan) * 10000,
       gudongrenshu: this.getV(gudongrenshu),
-      liudongfuzhai: this.getV(liudongfuzhai),
-      changqifuzhai: this.getV(changqifuzhai),
-      zibengongjijin: this.getV(zibengongjijin),
+      liudongfuzhai: this.getV(liudongfuzhai) * 10000,
+      changqifuzhai: this.getV(changqifuzhai) * 10000,
+      zibengongjijin: this.getV(zibengongjijin) * 10000,
       jingzichan: this.getV(jingzichan),
-      zhuyingshouru: this.getV(zhuyingshouru),
-      zhuyinglirun: this.getV(zhuyinglirun),
-      yingshouzhangkuan: this.getV(yingshouzhangkuan),
-      yingyelirun: this.getV(yingyelirun),
-      touzishouyu: this.getV(touzishouyu),
-      jingyingxianjinliu: this.getV(jingyingxianjinliu),
-      zongxianjinliu: this.getV(zongxianjinliu),
-      cunhuo: this.getV(cunhuo),
-      lirunzonghe: this.getV(lirunzonghe),
-      shuihoulirun: this.getV(shuihoulirun),
-      jinglirun: this.getV(jinglirun),
-      weifenlirun: this.getV(weifenlirun),
-      baoliu1: this.getV(baoliu1),
+      zhuyingshouru: this.getV(zhuyingshouru) * 10000,
+      zhuyinglirun: this.getV(zhuyinglirun) * 10000,
+      yingshouzhangkuan: this.getV(yingshouzhangkuan) * 10000,
+      yingyelirun: this.getV(yingyelirun) * 10000,
+      touzishouyu: this.getV(touzishouyu) * 10000,
+      jingyingxianjinliu: this.getV(jingyingxianjinliu) * 10000,
+      zongxianjinliu: this.getV(zongxianjinliu) * 10000,
+      cunhuo: this.getV(cunhuo) * 10000,
+      lirunzonghe: this.getV(lirunzonghe) * 10000,
+      shuihoulirun: this.getV(shuihoulirun) * 10000,
+      jinglirun: this.getV(jinglirun) * 10000,
+      weifenlirun: this.getV(weifenlirun) * 10000,
+      meigujingzichan: this.getV(baoliu1),
       baoliu2: this.getV(baoliu2)
     };
   }
@@ -123,12 +128,7 @@ class GetFinanceInfo extends BaseParser {
   setup() {}
 
   getV(v) {
-    if (v === 0) {
-      return 0;
-    }
-    else {
-      return getVolume(v);
-    }
+    return v;
   }
 }
 

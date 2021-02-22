@@ -9,7 +9,7 @@ const {
 
 class SetupCmd1 extends BaseParser {
   setup() {
-    this.sendPkg = Buffer.from('0c0218930001030003000d0001', 'hex'); // self.sendPkg = bytearray.fromhex(u'0c 02 18 93 00 01 03 00 03 00 0d 00 01')
+    this.sendPkg = Buffer.from('0c0000000000020002001500', 'hex'); // self.sendPkg = bytearray.fromhex(u'0c 02 18 93 00 01 03 00 03 00 0d 00 01')
   }
 
   parseResponse(bodyBuf) {
@@ -19,7 +19,7 @@ class SetupCmd1 extends BaseParser {
 
 class SetupCmd2 extends BaseParser {
   setup() {
-    this.sendPkg = Buffer.from('0c0218940001030003000d0002', 'hex');
+    this.sendPkg = Buffer.from('0c0218940001030003000d0001', 'hex');
   }
 
   parseResponse(bodyBuf) {
@@ -35,12 +35,13 @@ class SetupCmd3 extends BaseParser {
   u'00 00 02'
   */
   setup() {
-    let arr = bufferToBytes(Buffer.from('0c031899000120002000db0fd5', 'hex'));
-    arr = arr.concat(bufferToBytes(Buffer.from('d0c9ccd6a4a8af0000008fc225', 'hex')));
-    arr = arr.concat(bufferToBytes(Buffer.from('40130000d500c9ccbdf0d7ea00', 'hex')));
-    arr = arr.concat(bufferToBytes(Buffer.from('000002', 'hex')));
-    // this.sendPkg = Buffer.from('0c031899000120002000db0fd5 d0c9ccd6a4a8af0000008fc225 40130000d500c9ccbdf0d7ea00 000002', 'hex');
-    this.sendPkg = bytesToBuffer(arr);
+    // let arr = bufferToBytes(Buffer.from('0c031899000120002000db0fd5', 'hex'));
+    // arr = arr.concat(bufferToBytes(Buffer.from('d0c9ccd6a4a8af0000008fc225', 'hex')));
+    // arr = arr.concat(bufferToBytes(Buffer.from('40130000d500c9ccbdf0d7ea00', 'hex')));
+    // arr = arr.concat(bufferToBytes(Buffer.from('000002', 'hex')));
+    
+    // this.sendPkg = bytesToBuffer(arr);
+    this.sendPkg = Buffer.from('0c031899000120002000db0fb9fabdf0d6a4c8af000000f628f440000000000000000000000000000004', 'hex');
   }
 
   parseResponse(bodyBuf) {

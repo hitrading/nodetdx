@@ -11,7 +11,7 @@ const {
 class GetCompanyInfoCategory extends BaseParser {
   
   setParams(market, code) {
-    const pkg = Buffer.from('0c0f109b00010e000e00cf02', 'hex');
+    const pkg = Buffer.from('0c02109b00010e000e00cf02', 'hex');
     let pkgArr = bufferToBytes(pkg);
     const pkgParam = bufferpack.pack('<H6sI', [market, code, 0]);
     pkgArr = pkgArr.concat(bufferToBytes(pkgParam));
