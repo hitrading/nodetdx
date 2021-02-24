@@ -48,7 +48,7 @@ module.exports = {
   },
   error: function(...args) {
     if (level > NONE) {
-      process.stdout.write(`[${new Date().toLocaleString()}] `);
+      printNow();
       console.error(...args);
     }
   },
