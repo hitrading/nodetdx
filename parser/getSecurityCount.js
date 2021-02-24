@@ -33,7 +33,6 @@ const {
 class GetSecurityCountCmd extends BaseParser {
   setParams(market) {
     market = '' + market;
-    console.log('market', market)
     let pkg = Buffer.from('0c0c186c0001080008004e04', 'hex'); // pkg = bytearray.fromhex(u"0c 0c 18 6c 00 01 08 00 08 00 4e 04")
     const pkgParam = bufferpack.pack('<H', market);
     let pkgArr = bufferToBytes(pkg);

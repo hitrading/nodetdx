@@ -16,7 +16,7 @@ class MethodNotImplemented extends Error {}
 
 const RSP_HEADER_LEN = 0x10;
 
-let totalSended = 0;
+// let totalSended = 0;
 class BaseParser {
   constructor(client) {
     this.client = client;
@@ -44,70 +44,75 @@ class BaseParser {
 
     logger.debug('send package:', this.sendPkg);
 
-    await this.client.writeAll(this.sendPkg);
+    try {
+      // writeAll分trunk发送到缓存再一次性输出到底层硬件；write则是默认处理，可能是发送一部分到缓存，由缓存输出到硬件，然后再继续发送另一部分到缓存，如此反复
+      // write返回的就是sendPkg的长度，无需再有多余的长度判等逻辑，
+      // writeAll才会返回真实的stream.bytesWritten，但在setInterval中调用writeAll会引起以下告警：
+      // (node:46580) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 error listeners added. Use emitter.setMaxListeners() to increase limit
+      // (node:46580) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close listeners added. Use emitter.setMaxListeners() to increase limit
+      // (node:46580) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 finish listeners added. Use emitter.setMaxListeners() to increase limit
+      // (node:46580) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 drain listeners added. Use emitter.setMaxListeners() to increase limit
+      await this.client.write(this.sendPkg);
+    }
+    catch(e) {
+      throw new SendRequestPkgFails('send fails');
+    }
 
-    let nSended = this.client.socket.bytesWritten; // bytesRead
-    logger.debug('raw nSended', nSended);
-    const nRawSended = nSended;
-    nSended = nSended - totalSended;
-    totalSended = nRawSended;
+    // let nSended = this.client.socket.bytesWritten; // bytesRead
+    // logger.debug('raw nSended', nSended);
+    // const nRawSended = nSended;
+    // nSended = nSended - totalSended;
+    // totalSended = nRawSended;
 
-    logger.debug('nSended', nSended, this.sendPkg.length);
+    // logger.debug('nSended', nSended, this.sendPkg.length);
 
     // logger.debug('send package:', this.sendPkg);
 
-    if (nSended !== this.sendPkg.length) {
-      logger.debug('send bytes error');
-      throw new SendRequestPkgFails('send fails');
-    }
-    else {
-      const headBuf = await this.client.read(this.rspHeaderLen);
-      logger.debug('recv headBuf', headBuf, '|len is :', headBuf.length);
+    const headBuf = await this.client.read(this.rspHeaderLen);
+    logger.debug('recv headBuf', headBuf, '|len is :', headBuf.length);
 
-      if (headBuf.length === this.rspHeaderLen) {
-        const list = bufferpack.unpack('<IIIHH', headBuf); // _, _, _, zipSize, unzipSize = struct.unpack("<IIIHH", headBuf)
-        const zipSize = list[3], unzipSize = list[4];
-        // console.log(data)
-        logger.debug('zip size is: ', zipSize);
-        let bodyBuf = [], buf; // bodyBuf = bytearray()
-        while(true) {
-          buf = await this.client.read(zipSize);
-          for (let i = 0; i < buf.length; i++) {
-            bodyBuf.push(buf[i]);
-          }
-          // bodyBuf.
-          // bodyBuf.push(buf); // bodyBuf.extend(buf);
-          logger.debug('buf.length', buf.length, 'bodyBuf.length', bodyBuf.length);
-          if (!buf || !buf.length || bodyBuf.length === zipSize) {
-            break;
-          }
+    if (headBuf.length === this.rspHeaderLen) {
+      const [ , , , zipSize, unzipSize ] = bufferpack.unpack('<IIIHH', headBuf); // _, _, _, zipSize, unzipSize = struct.unpack("<IIIHH", headBuf)
+      logger.debug('zip size is: ', zipSize);
+      let bodyBuf = [], buf; // bodyBuf = bytearray()
+      while(true) {
+        buf = await this.client.read(zipSize);
+        for (let i = 0; i < buf.length; i++) {
+          bodyBuf.push(buf[i]);
         }
 
-        if (!buf.length) {
-          logger.debug('接收数据体失败服务器断开连接');
-          throw new ResponseRecvFails('接收数据体失败服务器断开连接');
+        logger.debug('buf.length', buf.length, 'bodyBuf.length', bodyBuf.length);
+        if (!buf || !buf.length || bodyBuf.length === zipSize) {
+          break;
         }
+      }
 
-        if (zipSize === unzipSize) {
-          logger.debug('不需要解压');
-        }
-        else {
-          // 解压
-          logger.debug('需要解压');
-          let unzipedData;
-          unzipedData = zlib.unzipSync(Buffer.from(bodyBuf)); // unzipedData = zlib.decompress(buffer(bodyBuf));
-          // unzipedData = zlib.unzipSync(bodyBuf); // zlib.decompress
-          bodyBuf = unzipedData;
-        }
+      if (!buf.length) {
+        logger.debug('接收数据体失败服务器断开连接');
+        throw new ResponseRecvFails('接收数据体失败服务器断开连接');
+      }
 
-        logger.debug('recv body ', JSON.stringify(bodyBuf));
-
-        return this.parseResponse(bodyBuf);
+      if (zipSize === unzipSize) {
+        logger.debug('> need not unzip');
       }
       else {
-        logger.debug('headBuf is not 0x10');
-        throw new ResponseHeaderRecvFails('headBuf is not 0x10');
+        // 解压
+        logger.debug('> need unzip');
+        let unzipedData;
+        unzipedData = zlib.unzipSync(Buffer.from(bodyBuf)); // unzipedData = zlib.decompress(buffer(bodyBuf));
+        // unzipedData = zlib.unzipSync(bodyBuf); // zlib.decompress
+        bodyBuf = unzipedData;
       }
+
+      logger.debug('recv body ', JSON.stringify(bodyBuf));
+
+      this.client.lastAckTime = Date.now(); // 记录最后一次请求的时间戳, 用于计算心跳包触发时间
+
+      return this.parseResponse(bodyBuf);
+    }
+    else {
+      logger.debug('headBuf is not 0x10');
+      throw new ResponseHeaderRecvFails('headBuf is not 0x10');
     }
   }
 

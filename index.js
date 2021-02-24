@@ -1,11 +1,14 @@
 const constant = require('./constant');
-const marketHosts = require('./config/hosts');
+const { marketHosts, exMarketHosts } = require('./config/hosts');
 const TdxMarketApi = require('./hq');
-const { enableDebug } = require('./log');
+const TdxExMarketApi = require('./exhq');
+const logger = require('./log');
 
 module.exports = {
-  ...constant,
+  constant,
   marketHosts,
-  enableDebug,
-  TdxMarketApi
+  exMarketHosts,
+  logger,
+  TdxMarketApi,
+  TdxExMarketApi
 };

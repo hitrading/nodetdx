@@ -1,4 +1,4 @@
-# nodetdx 通达信数据接口（翻译pytdx - 只翻译了标准行情的部分，有需要其他功能的可参考已翻译代码自行解决）
+# nodetdx 通达信数据接口
 ========
 
 概述
@@ -223,6 +223,9 @@ await api.getExRightInfo(1, '600300')
 ```javascript
 await api.getFinanceInfo(0, '000001')
 ```
+
+#### 14 : 读取扩展行情
+待完善, 可参考标准行情用法
 
 ## 其它
 

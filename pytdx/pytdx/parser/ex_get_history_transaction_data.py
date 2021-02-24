@@ -5,6 +5,7 @@ from pytdx.helper import get_datetime, get_volume, get_price
 from collections import OrderedDict
 import struct
 import datetime
+import hexdump
 
 class GetHistoryTransactionData(BaseParser):
 
@@ -18,6 +19,7 @@ class GetHistoryTransactionData(BaseParser):
         # pkg1 = bytearray.fromhex('01 01 30 00 02 01 16 00 16 00 06 24 3b c8 33 01 1f 30 30 30 32 30 00 00 00 01 00 00 00 00 f0 00')
         pkg = bytearray.fromhex('01 01 30 00 02 01 16 00 16 00 06 24')
         pkg.extend(struct.pack("<IB9siH", date, market, code, start, count))
+        print(hexdump.hexdump(pkg))
         self.send_pkg = pkg
         self.date = date
 

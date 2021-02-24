@@ -107,7 +107,7 @@ function getPrice(data, pos) {
         break;
     }
   }
-      
+
   pos += 1;
 
   if (sign)
@@ -170,9 +170,46 @@ function getTime(buffer, pos) {
   return [hour, minute, pos];
 }
 
-function formatDatetime(year, month, day, hour, minute) {
-  return padStart(year, 4) + '-' + padStart(month, 2) + '-' + padStart(day, 2) + ' ' + padStart(hour, 2) + ':' + padStart(minute, 2);
+function formatDatetime(...args) {
+  let fmt = args.pop();
+  let date;
+  if (args.length === 1) {
+    const firstArg = args[0];
+    if (typeof firstArg === 'string') {
+      date = new Date(firstArg);
+    }
+    else if (Object.prototype.toString.call(firstArg) === '[object Date]') {
+      date = firstArg;
+    }
+  }
+  else {
+    if (args[1]) { // 月份
+      args[1] -= 1;
+    }
+    date = new Date(...args);
+  }
+
+  const o = {
+    'M+': date.getMonth() + 1, //月份
+    'd+': date.getDate(), //日
+    'h+': date.getHours(), //小时
+    'm+': date.getMinutes(), //分
+    's+': date.getSeconds(), //秒
+    'q+': Math.floor((date.getMonth() + 3) / 3), //季度
+    'S+': date.getMilliseconds() //毫秒
+  };
+  if (/(y+)/i.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+  }
+  for (var k in o) {
+    if (new RegExp('(' + k + ')', 'i').test(fmt)) {
+      fmt = fmt.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).substr(-RegExp.$1.length));
+    }
+  }
+
+  return fmt;
 }
+
 
 function padStart(str, count, fillStr = '0') {
   if (typeof str === 'number') {

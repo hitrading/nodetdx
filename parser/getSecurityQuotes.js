@@ -133,7 +133,7 @@ class GetSecurityQuotesCmd extends BaseParser {
       // pos += 10 // TODO: 处理同时查询多只股票解析响应数据异常的问题
 
       // console.log('bodyBuf[%d][%d]', pos,pos+1, bodyBuf[pos], bodyBuf[pos+1])
-      
+
       [reversedBytes4] = bufferpack.unpack('<H', bodyBuf.slice(pos, pos+2));
       pos += 2;
       [reversedBytes5, pos] = getPrice(bodyBuf, pos);
@@ -221,24 +221,25 @@ class GetSecurityQuotesCmd extends BaseParser {
   /**
    * format time from reversedBytes0
    * by using method from https://github.com/rainx/pytdx/issues/187
-   * @param {*} timestamp 
+   * @param {*} timestamp
    */
   formatTime(timestamp) {
     timestamp = '' + timestamp;
-    // console.log(typeof timestamp, timestamp)
+    // console.log(typeof timestamp, timestamp);
     let time = timestamp.slice(0, -6) + ':';
     const s = timestamp.slice(-6, -4);
+    // console.log('time: %s, s: %s', time, s);
     if (+s < 60) {
-        time += s + ':';
-        let n = Number(timestamp.slice(-4)) * 60 / 10000;
-        let sn = n.toFixed(3);
-        if (n < 10) {
-          sn = '0' + sn;
-        }
-        time += sn;
+      time += s + ':';
+      let n = Number(timestamp.slice(-4)) * 60 / 10000;
+      let sn = n.toFixed(3);
+      if (n < 10) {
+        sn = '0' + sn;
+      }
+      time += sn;
     }
     else {
-      time += (Number(timestamp.slice(-6)) * 60 / 1000000).toFixed(0) + ':';
+      time += Math.floor(Number(timestamp.slice(-6)) * 60 / 1000000) + ':';
       let n = (Number(timestamp.slice(-6)) * 60 % 1000000) * 60 / 1000000;
       let sn = n.toFixed(3);
       if (n < 10) {
