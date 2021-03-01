@@ -55,7 +55,8 @@ class BaseParser {
       await this.client.write(this.sendPkg);
     }
     catch(e) {
-      throw new SendRequestPkgFails('send fails');
+      logger.error(new SendRequestPkgFails('send fails: ' + e.stack));
+      throw e;
     }
 
     // let nSended = this.client.socket.bytesWritten; // bytesRead
@@ -88,8 +89,8 @@ class BaseParser {
       }
 
       if (!buf.length) {
-        logger.debug('接收数据体失败服务器断开连接');
-        throw new ResponseRecvFails('接收数据体失败服务器断开连接');
+        logger.error('read fails, server disconnected.');
+        throw new ResponseRecvFails('read fails, server disconnected.');
       }
 
       if (zipSize === unzipSize) {
