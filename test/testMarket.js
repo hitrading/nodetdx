@@ -39,41 +39,45 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // logger.info(companyCategory)
     // const companyInfo = await api.getCompanyInfoContent(0, '000001', '000001.txt', 0, 20000);
     // logger.info(companyInfo);
-    // const bars = await api.getBars(9, '000001', '2021-02-19', '2021-02-26')
+    // const bars = await api.findBars(9, '000001', '2021-02-19', '2021-02-26')
     // logger.info(JSON.stringify(bars));
     // api.disconnect()
-    let c = 0;
+    // let c = 0;
 
-    async function getSecurityQuotes () {
-      c++;
-      const t = Date.now();
-      const quotes = await api.getSecurityQuotes(1, '600300');
-      const { price, bid1, ask1, bidVol1, askVol1, serverTime } = quotes[0]
-      logger.info(JSON.stringify({
-        price,
-        bid1,
-        ask1,
-        bidVol1,
-        askVol1,
-        serverTime,
-        'rsp - req': Date.now() - t,
-        c
-      }));
+    // async function getSecurityQuotes () {
+    //   c++;
+    //   const t = Date.now();
+    //   const quotes = await api.getSecurityQuotes(1, '600300');
+    //   const { price, bid1, ask1, bidVol1, askVol1, serverTime } = quotes[0]
+    //   logger.info(JSON.stringify({
+    //     price,
+    //     bid1,
+    //     ask1,
+    //     bidVol1,
+    //     askVol1,
+    //     serverTime,
+    //     'rsp - req': Date.now() - t,
+    //     c
+    //   }));
 
-      if (c < 20) {
-        setTimeout(() => getSecurityQuotes(), 1000);
-      }
-      else {
-        c = 0;
-        setTimeout(() => getSecurityQuotes(), 200000);
-      }
+    //   if (c < 20) {
+    //     setTimeout(() => getSecurityQuotes(), 1000);
+    //   }
+    //   else {
+    //     c = 0;
+    //     setTimeout(() => getSecurityQuotes(), 200000);
+    //   }
 
-      // getSecurityQuotes();
-    }
+    //   // getSecurityQuotes();
+    // }
 
-    getSecurityQuotes();
+    // getSecurityQuotes();
 
+    api.getSecurityQuotes(1, '600520').then(quote => console.log(quote));
+    api.getSecurityQuotes(1, '600300').then(quote => console.log(quote));
+    api.getSecurityQuotes(0, '000001').then(quote => console.log(quote));
 
+    api.findBars(9, '000001', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars)));
 
     let st = Date.now();
 

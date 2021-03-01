@@ -94,6 +94,38 @@ class TdxExMarketApi extends BaseSocketClient {
     cmd.setParams(market, category, start, count);
     return await cmd.callApi();
   }
+
+  async checkQueue() {
+    const firstReq = this.reqQueue[0];
+    if (firstReq && !this.lock) {
+      this.lock = true;
+      const [resolve, target, thisArg, argumentsList] = firstReq;
+      const data = await target.apply(thisArg, argumentsList);
+      this.reqQueue.shift();
+      Promise.resolve().then(() => {
+        this.lock = false;
+        return this.checkQueue();
+      });
+      resolve(data);
+    }
+  }
 }
+
+Object.getOwnPropertyNames(TdxExMarketApi.prototype).forEach(name => {
+  const property = TdxExMarketApi.prototype[name];
+  if (typeof property === 'function' && /^get/.test(name)) {
+    TdxExMarketApi.prototype[name] = new Proxy(
+      TdxExMarketApi.prototype[name],
+      {
+        apply (target, thisArg, argumentsList) {
+          return new Promise((resolve) => {
+            thisArg.reqQueue.push([resolve, target, thisArg, argumentsList]);
+            thisArg.checkQueue();
+          });
+        }
+      }
+    )
+  }
+});
 
 module.exports = TdxExMarketApi;

@@ -123,7 +123,7 @@ class TdxMarketApi extends BaseSocketClient {
    * @param {String} startDatetime
    * @param {String} endDatetime
    */
-  async getBars(category = 9, code, startDatetime, endDatetime) {
+  async findBars(category = 9, code, startDatetime, endDatetime) {
     // 具体详情参见 https://github.com/rainx/pytdx/issues/5
     // 具体详情参见 https://github.com/rainx/pytdx/issues/21
 
@@ -165,6 +165,21 @@ class TdxMarketApi extends BaseSocketClient {
     return bars;
   }
 
+  async checkQueue() {
+    const firstReq = this.reqQueue[0];
+    if (firstReq && !this.lock) {
+      this.lock = true;
+      const [resolve, target, thisArg, argumentsList] = firstReq;
+      const data = await target.apply(thisArg, argumentsList);
+      this.reqQueue.shift();
+      Promise.resolve().then(() => {
+        this.lock = false;
+        return this.checkQueue();
+      });
+      resolve(data);
+    }
+  }
+
 }
 
 function getMarketCode(code) {
@@ -176,5 +191,22 @@ function getMarketCode(code) {
   // }
   // return 0;
 }
+
+Object.getOwnPropertyNames(TdxMarketApi.prototype).forEach(name => {
+  const property = TdxMarketApi.prototype[name];
+  if (typeof property === 'function' && /^get/.test(name)) {
+    TdxMarketApi.prototype[name] = new Proxy(
+      TdxMarketApi.prototype[name],
+      {
+        apply (target, thisArg, argumentsList) {
+          return new Promise((resolve) => {
+            thisArg.reqQueue.push([resolve, target, thisArg, argumentsList]);
+            thisArg.checkQueue();
+          });
+        }
+      }
+    )
+  }
+});
 
 module.exports = TdxMarketApi;

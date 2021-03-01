@@ -20,6 +20,7 @@ class BaseSocketClient {
     this.heartbeatInterval = heartbeatInterval;
     this.onTimeout = onTimeout;
     this.idleTimeout = idleTimeout;
+    this.reqQueue = []; // 请求队列
 
     const socket = new net.Socket();
     const promiseSocket = new PromiseSocket(socket);

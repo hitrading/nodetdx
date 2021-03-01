@@ -27,10 +27,10 @@ const api = new TdxExMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 })
     // logger.info(await api.getHistoryTransactionData(47, "IFL0", 20200222));
     // logger.info(await api.getHistoryTransactionData(47, 'IFL0', 20200222));
 
-    logger.info("查询k线")
-    logger.info(await api.getInstrumentBars(9, 8, "10000843"))
-    const data = await api.getInstrumentBars(8, 47, "IFL0")
-    logger.info(JSON.stringify(data.slice(-10)))
+    // logger.info("查询k线")
+    // logger.info(await api.getInstrumentBars(9, 8, "10000843"))
+    // const data = await api.getInstrumentBars(8, 47, "IFL0")
+    // logger.info(JSON.stringify(data.slice(-10)))
     // logger.info("查询代码列表")
     // logger.info(await api.getInstrumentInfo(10000, 98))
 
@@ -39,6 +39,10 @@ const api = new TdxExMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 })
 
     // logger.info("按日期区间查询K线")
     // logger.info((await api.getHistoryInstrumentBarsRange(47, "IFL0", 20210220, 20210224)).reverse())
+
+    api.getInstrumentBars(8, 47, "IFL0").then(data => logger.info(JSON.stringify(data.slice(-10))));
+    api.getInstrumentBars(8, 47, "IF2103").then(data => logger.info(JSON.stringify(data.slice(-10))));
+    api.getInstrumentInfo(10000, 98).then(data => console.log(data))
 
     let st = Date.now();
 
