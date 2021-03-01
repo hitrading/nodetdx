@@ -4,8 +4,8 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
   getPrice,
   getTime,
   padStart
@@ -18,10 +18,8 @@ class GetHistoryTransactionData extends BaseParser {
     }
 
     const pkg = Buffer.from('0c013001000112001200b50f', 'hex');
-    let pkgArr = bufferToBytes(pkg);
     const pkgParam = bufferpack.pack('<IH6sHH', [date, market, code, start, count]);
-    pkgArr = pkgArr.concat(bufferToBytes(pkgParam));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   parseResponse(bodyBuf) {

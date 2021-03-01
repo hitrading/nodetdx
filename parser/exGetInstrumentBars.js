@@ -21,8 +21,8 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
   getDatetime,
   formatDatetime
 } = require('../helper');
@@ -33,14 +33,13 @@ class ExGetInstrumentBars extends BaseParser {
 
   setParams(category, market, code, start, count) {
     const pkg = Buffer.from('0101086a010116001600', 'hex');
-    let pkgArr = bufferToBytes(pkg);
-    pkgArr = pkgArr.concat(bufferToBytes(Buffer.from('ff23', 'hex')));
+    const pkgParam1 = Buffer.from('ff23', 'hex');
 
     this.category = category;
 
     // let lastValue = 0x00f00000;
-    pkgArr = pkgArr.concat(bufferToBytes(bufferpack.pack('<B9sHHIH', [ market, code, category, 1, start, count ]))); // 这个1还不确定是什么作用，疑似和是否复权有关
-    this.sendPkg = bytesToBuffer(pkgArr);
+    const pkgParam2 = bufferpack.pack('<B9sHHIH', [ market, code, category, 1, start, count ]); // 这个1还不确定是什么作用，疑似和是否复权有关
+    this.sendPkg = Buffer.concat([pkg, pkgParam1, pkgParam2]);
   }
 
   parseResponse(bodyBuf) {

@@ -4,8 +4,8 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
   getVolume,
 } = require('../helper');
 
@@ -15,9 +15,9 @@ class GetSecurityList extends BaseParser {
     start = '' + start;
     const pkg = Buffer.from('0c0118640101060006005004', 'hex');
     const pkgParam = bufferpack.pack('<HH', [market, start]);
-    let arr = bufferToBytes(pkg);
-    arr = arr.concat(bufferToBytes(pkgParam));
-    this.sendPkg = bytesToBuffer(arr);
+    // let arr = bufferToBytes(pkg);
+    // arr = arr.concat(bufferToBytes(pkgParam));
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   parseResponse(bodyBuf) {

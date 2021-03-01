@@ -14,18 +14,17 @@
 
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-const {
-  bufferToBytes,
-  bytesToBuffer,
-} = require('../helper');
+// const {
+//   bufferToBytes,
+//   bytesToBuffer,
+// } = require('../helper');
 
 
 class ExGetInstrumentInfo extends BaseParser {
   setParams(start, count = 100) {
     const pkg = Buffer.from('01044867000108000800f523', 'hex');
-    let pkgArr = bufferToBytes(pkg);
-    pkgArr = pkgArr.concat(bufferToBytes(bufferpack.pack('<IH', [ start, count ])));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    const pkgParam = bufferpack.pack('<IH', [ start, count ]);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   parseResponse(bodyBuf) {

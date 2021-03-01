@@ -1,17 +1,16 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
   formatDatetime
 } = require('../helper');
 
 class ExGetHistoryTransactionData extends BaseParser {
   setParams(market, code, date, start, count) {
     const pkg = Buffer.from('010130000201160016000624', 'hex');
-    let pkgArr = bufferToBytes(pkg);
-    pkgArr = pkgArr.concat(bufferToBytes(bufferpack.pack('<IB9siH', [ date, market, code, start, count ])));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    const pkgParam = bufferpack.pack('<IB9siH', [ date, market, code, start, count ]);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
     this.date = date;
     // console.log(this.sendPkg)
     // console.log([ date, market, code, start, count ]);

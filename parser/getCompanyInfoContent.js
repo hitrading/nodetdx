@@ -3,10 +3,10 @@
 
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-const {
-  bufferToBytes,
-  bytesToBuffer,
-} = require('../helper');
+// const {
+//   bufferToBytes,
+//   bytesToBuffer,
+// } = require('../helper');
 
 class GetCompanyInfoContent extends BaseParser {
   setParams(market, code, filename, start, length) {
@@ -15,10 +15,8 @@ class GetCompanyInfoContent extends BaseParser {
     }
 
     const pkg = Buffer.from('0c03109c000168006800d002', 'hex');
-    let pkgArr = bufferToBytes(pkg);
     const pkgParam = bufferpack.pack('<H6sH80sIII', [market, code, 0, filename, start, length, 0]);
-    pkgArr = pkgArr.concat(bufferToBytes(pkgParam));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   parseResponse(bodyBuf) {

@@ -14,18 +14,17 @@
 
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-const {
-  bufferToBytes,
-  bytesToBuffer,
-} = require('../helper');
+// const {
+//   bufferToBytes,
+//   bytesToBuffer,
+// } = require('../helper');
 
 class ExGetInstrumentQuoteList extends BaseParser {
   setParams(market, category, start, count) {
     const pkg = Buffer.from('01c1060b00020b000b000024', 'hex');
-    let pkgArr = bufferToBytes(pkg);
-    pkgArr = pkgArr.concat(bufferToBytes(bufferpack.pack('<BHHHH', [ market, 0, start, count, 1 ])));
+    const pkgParam = bufferpack.pack('<BHHHH', [ market, 0, start, count, 1 ]);
     this.category = category;
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   parseResponse(bodyBuf) {
@@ -72,41 +71,41 @@ class ExGetInstrumentQuoteList extends BaseParser {
   extractHongKongStocks(market, code, bodyBuf, datalist, pos) {
     const dataPackFormat = '<IfffffIfIIfIIIIfffffIIIIIfffffIIIII';
     const [
-      HuoYueDu,
-      ZuoShou,
-      JinKai,
-      ZuiGao,
-      ZuiDi,
-      XianJia,
+      activity,
+      preClose,
+      open, // 今开(盘价)
+      high,
+      low,
+      lastPrice,
       ,  // 0
-      MaiRuJia,  // ?
-      ZongLiang,
-      XianLiang,  // ?
-      ZongJinE,
+      bid,  // ?
+      totalVol,
+      vol,  // ?
+      totalAmount,
       ,  // ?
       ,  // ?
-      Nei,  // 0
-      Wai,  // 0 Nei/Wai = 内外比？
-      MaiRuJia1,
-      MaiRuJia2,
-      MaiRuJia3,
-      MaiRuJia4,
-      MaiRuJia5,
-      MaiRuLiang1,
-      MaiRuLiang2,
-      MaiRuLiang3,
-      MaiRuLiang4,
-      MaiRuLiang5,
-      MaiChuJia1,
-      MaiChuJia2,
-      MaiChuJia3,
-      MaiChuJia4,
-      MaiChuJia5,
-      MaiChuLiang1,
-      MaiChuLiang2,
-      MaiChuLiang3,
-      MaiChuLiang4,
-      MaiChuLiang5
+      inner,  // 0
+      outer,  // 0 inner/outer = 内外比？
+      bid1,
+      bid2,
+      bid3,
+      bid4,
+      bid5,
+      bidVol1,
+      bidVol2,
+      bidVol3,
+      bidVol4,
+      bidVol5,
+      ask1,
+      ask2,
+      ask3,
+      ask4,
+      ask5,
+      askVol1,
+      askVol2,
+      askVol3,
+      askVol4,
+      askVol5
      ] = bufferpack.unpack(dataPackFormat, bodyBuf.slice(pos, pos + 140));
 
     pos += 290;
@@ -114,38 +113,38 @@ class ExGetInstrumentQuoteList extends BaseParser {
     datalist.push({
       market,
       code,
-      HuoYueDu,
-      ZuoShou,
-      JinKai,
-      ZuiGao,
-      ZuiDi,
-      XianJia,
-      MaiRuJia,
-      ZongLiang,
-      XianLiang,
-      ZongJinE,
-      Nei,
-      Wai,
-      MaiRuJia1,
-      MaiRuJia2,
-      MaiRuJia3,
-      MaiRuJia4,
-      MaiRuJia5,
-      MaiRuLiang1,
-      MaiRuLiang2,
-      MaiRuLiang3,
-      MaiRuLiang4,
-      MaiRuLiang5,
-      MaiChuJia1,
-      MaiChuJia2,
-      MaiChuJia3,
-      MaiChuJia4,
-      MaiChuJia5,
-      MaiChuLiang1,
-      MaiChuLiang2,
-      MaiChuLiang3,
-      MaiChuLiang4,
-      MaiChuLiang5
+      activity, // 活跃度
+      preClose, // 昨收
+      open,
+      high,
+      low,
+      lastPrice, // 现价
+      bid, // 买入价
+      totalVol, // 总量
+      vol, // 现量
+      totalAmount,
+      inner,
+      outer,
+      bid1,
+      bid2,
+      bid3,
+      bid4,
+      bid5,
+      bidVol1,
+      bidVol2,
+      bidVol3,
+      bidVol4,
+      bidVol5,
+      ask1,
+      ask2,
+      ask3,
+      ask4,
+      ask5,
+      askVol1,
+      askVol2,
+      askVol3,
+      askVol4,
+      askVol5
     });
 
     return pos;
@@ -154,9 +153,9 @@ class ExGetInstrumentQuoteList extends BaseParser {
   extractFutures(market, code, bodyBuf, datalist, pos) {
     const dataPackFormat = '<IfffffIIIIfIIfIfIIIIIIIIIfIIIIIIIII';
     const [
-      BiShu, ZuoJie, JinKai, ZuiGao, ZuiDi, MaiChu, KaiCang, , ZongLiang,
-      XianLiang, ZongJinE, NeiPan, WaiPan, , ChiCangLiang, MaiRuJia, , , , , MaiRuLiang,
-      , , , , MaiChuJia, , , , , MaiChuLiang
+      transNum, preSettlementPrice, open, high, low, ask, KaiCang, , totalVol,
+      vol, totalAmount, inner, outer, , openInterest, bid, , , , , bidVol,
+      , , , , ask, , , , , askVol
     ] = bufferpack.unpack(dataPackFormat, bodyBuf.slice(pos, pos + 140));
 
     pos += 290;
@@ -164,23 +163,23 @@ class ExGetInstrumentQuoteList extends BaseParser {
     datalist.push({
       market,
       code,
-      BiShu,
-      ZuoJie,
-      JinKai,
-      ZuiGao,
-      ZuiDi,
-      MaiChu,
-      KaiCang,
-      ZongLiang,
-      XianLiang,
-      ZongJinE,
-      NeiPan,
-      WaiPan,
-      ChiCangLiang,
-      MaiRuJia,
-      MaiRuLiang,
-      MaiChuJia,
-      MaiChuLiang
+      transNum, // 交易笔数
+      preSettlementPrice, // 昨结(算价)
+      open,
+      high,
+      low,
+      ask, // 卖出
+      openingVol, // 开仓(量)
+      totalVol,
+      vol,
+      totalAmount,
+      inner, // 内盘
+      outer, // 外盘
+      openInterest, // 持仓量
+      bid,
+      bidVol,
+      ask,
+      askVol
     });
 
     return pos;

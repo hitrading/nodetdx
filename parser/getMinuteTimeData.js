@@ -4,18 +4,16 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
   getPrice,
 } = require('../helper');
 
 class GetMinuteTimeData extends BaseParser {
   setParams(market, code) {
     const pkg = Buffer.from('0c1b080001010e000e001d05', 'hex');
-    let pkgArr = bufferToBytes(pkg);
     const pkgParam = bufferpack.pack('<H6sI', [market, code, 0]);
-    pkgArr = pkgArr.concat(bufferToBytes(pkgParam));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   // b1cb74000c1b080001b61d05be03be03f0000000a208ce038d2c028302972f4124b11a00219821011183180014891c0009be0b4207b11000429c2041....

@@ -2,10 +2,10 @@
 
 // const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-const {
-  bufferToBytes,
-  bytesToBuffer,
-} = require('../helper');
+// const {
+//   bufferToBytes,
+//   bytesToBuffer,
+// } = require('../helper');
 
 class SetupCmd1 extends BaseParser {
   setup() {
@@ -35,12 +35,6 @@ class SetupCmd3 extends BaseParser {
   u'00 00 02'
   */
   setup() {
-    // let arr = bufferToBytes(Buffer.from('0c031899000120002000db0fd5', 'hex'));
-    // arr = arr.concat(bufferToBytes(Buffer.from('d0c9ccd6a4a8af0000008fc225', 'hex')));
-    // arr = arr.concat(bufferToBytes(Buffer.from('40130000d500c9ccbdf0d7ea00', 'hex')));
-    // arr = arr.concat(bufferToBytes(Buffer.from('000002', 'hex')));
-    
-    // this.sendPkg = bytesToBuffer(arr);
     this.sendPkg = Buffer.from('0c031899000120002000db0fb9fabdf0d6a4c8af000000f628f440000000000000000000000000000004', 'hex');
   }
 

@@ -3,19 +3,17 @@
 
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-const {
-  bufferToBytes,
-  bytesToBuffer,
-} = require('../helper');
+// const {
+//   bufferToBytes,
+//   bytesToBuffer,
+// } = require('../helper');
 
 class GetCompanyInfoCategory extends BaseParser {
   
   setParams(market, code) {
     const pkg = Buffer.from('0c02109b00010e000e00cf02', 'hex');
-    let pkgArr = bufferToBytes(pkg);
     const pkgParam = bufferpack.pack('<H6sI', [market, code, 0]);
-    pkgArr = pkgArr.concat(bufferToBytes(pkgParam));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   /**

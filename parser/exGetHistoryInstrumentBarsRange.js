@@ -1,8 +1,8 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
   formatDatetime
 } = require('../helper');
 
@@ -14,15 +14,13 @@ class ExGetHistoryInstrumentBarsRange extends BaseParser {
 
   setParams(market, code, startDatetime, endDatetime) {
     const pkg = Buffer.from('01', 'hex');
-    let pkgArr = bufferToBytes(pkg);
-    pkgArr = pkgArr.concat(bufferToBytes(bufferpack.pack('<B', '' + this.seqId)));
+    const pkgParam1 = bufferpack.pack('<B', '' + this.seqId);
     this.seqId++;
-    pkgArr = pkgArr.concat(bufferToBytes(Buffer.from('38920001160016000D24', 'hex')));
-    pkgArr = pkgArr.concat(bufferToBytes(bufferpack.pack('<B9s', [ market, code ])));
-    pkgArr = pkgArr.concat(bufferToBytes(Buffer.from('0700', 'hex')));
-    pkgArr = pkgArr.concat(bufferToBytes(bufferpack.pack('<LL', [ startDatetime, endDatetime ])));
-    this.sendPkg = bytesToBuffer(pkgArr);
-    // console.log(pkgArr)
+    const pkgParam2 = Buffer.from('38920001160016000D24', 'hex');
+    const pkgParam3 = bufferpack.pack('<B9s', [ market, code ]);
+    const pkgParam4 = Buffer.from('0700', 'hex');
+    const pkgParam5 = bufferpack.pack('<LL', [ startDatetime, endDatetime ]);
+    this.sendPkg = Buffer.concat([pkg, pkgParam1, pkgParam2, pkgParam3, pkgParam4, pkgParam5]);
   }
 
   parseDate(num) {

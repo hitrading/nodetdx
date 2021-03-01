@@ -54,18 +54,17 @@
 
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-const {
-  bufferToBytes,
-  bytesToBuffer,
-} = require('../helper');
+// const {
+//   bufferToBytes,
+//   bytesToBuffer,
+// } = require('../helper');
 
 
 class ExGetInstrumentQuote extends BaseParser {
   setParams(market, code) {
     const pkg = Buffer.from('0101080202010c000c00fa23', 'hex');
-    let pkgArr = bufferToBytes(pkg);
-    pkgArr = pkgArr.concat(bufferToBytes(bufferpack.pack('<B9s', [ market, code ])));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    const pkgParam = bufferpack.pack('<B9s', [ market, code ]);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   parseResponse(bodyBuf) {

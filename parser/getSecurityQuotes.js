@@ -5,7 +5,7 @@ const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
   bufferToBytes,
-  bytesToBuffer,
+  // bytesToBuffer,
   getVolume,
   getPrice,
   findCSA,
@@ -35,19 +35,15 @@ class GetSecurityQuotesCmd extends BaseParser {
       stockLen,
     ];
 
-    const pkg_header = bufferpack.pack('<HIHHIIHH', values);
-    let pkgArr = bufferToBytes(pkg_header);
+    const pkgHeader = bufferpack.pack('<HIHHIIHH', values);
+    const pkgArr = [pkgHeader];
 
     stocks.forEach(([market, code]) => {
-      // if (typeof code === 'string') {
-        // code = this.decode(code, 'utf-8');
-        // console.log('[market, code]', market, code)
       const oneStockPkg = bufferpack.pack('<B6s', [market, code]);
-      pkgArr = pkgArr.concat(bufferToBytes(oneStockPkg));
-      // }
+      pkgArr.push(oneStockPkg)
     });
 
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat(pkgArr);
   }
 
   parseResponse(bodyBuf) {

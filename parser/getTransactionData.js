@@ -4,8 +4,8 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
   getPrice,
   getTime,
   padStart
@@ -14,10 +14,8 @@ const {
 class GetTransactionData extends BaseParser {
   setParams(market, code, start, count) {
     const pkg = Buffer.from('0c17080101010e000e00c50f', 'hex');
-    let pkgArr = bufferToBytes(pkg);
     const pkgParam = bufferpack.pack('<H6sHH', [market, code, start, count]);
-    pkgArr = pkgArr.concat(bufferToBytes(pkgParam));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   parseResponse(bodyBuf) {

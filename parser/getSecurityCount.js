@@ -26,19 +26,17 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
 } = require('../helper');
 
 class GetSecurityCountCmd extends BaseParser {
   setParams(market) {
     market = '' + market;
-    let pkg = Buffer.from('0c0c186c0001080008004e04', 'hex'); // pkg = bytearray.fromhex(u"0c 0c 18 6c 00 01 08 00 08 00 4e 04")
+    const pkg = Buffer.from('0c0c186c0001080008004e04', 'hex'); // pkg = bytearray.fromhex(u"0c 0c 18 6c 00 01 08 00 08 00 4e 04")
     const pkgParam = bufferpack.pack('<H', market);
-    let pkgArr = bufferToBytes(pkg);
-    pkgArr = pkgArr.concat(bufferToBytes(pkgParam));
-    pkgArr = pkgArr.concat(bufferToBytes(Buffer.from('75c73301', 'hex'))); // pkg.extend(b'\x75\xc7\x33\x01')
-    this.sendPkg = bytesToBuffer(pkgArr);
+    const pkgTail = Buffer.from('75c73301', 'hex');
+    this.sendPkg = Buffer.concat([pkg, pkgParam, pkgTail]);
   }
 
   parseResponse(bodyBuf) {

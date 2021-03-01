@@ -5,7 +5,7 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
 
 (async() => {
   if (await api.connect('101.133.214.242', 7709)) {
-    // let num = await api.getSecurityCount(1);
+    // let num = await api.getSecurityCount(0);
     // logger.info('0 api.getSecurityCount', num)
     // num = await api.getSecurityCount(1);
     // logger.info('1 api.getSecurityCount', num)

@@ -15,8 +15,8 @@
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
 const {
-  bufferToBytes,
-  bytesToBuffer,
+  // bufferToBytes,
+  // bytesToBuffer,
   getVolume,
   getDatetime,
 } = require('../helper');
@@ -41,10 +41,8 @@ const EX_RIGHT_CATEGORY_MAPPING = {
 class getExRightInfo extends BaseParser {
   setParams(market, code) {
     const pkg = Buffer.from('0c1f187600010b000b000f000100', 'hex');
-    let pkgArr = bufferToBytes(pkg);
     const pkgParam = bufferpack.pack('<B6s', [market, code]);
-    pkgArr = pkgArr.concat(bufferToBytes(pkgParam));
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
   }
 
   parseResponse(bodyBuf) {

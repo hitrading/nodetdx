@@ -21,19 +21,17 @@
 
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-const {
-  bufferToBytes,
-  bytesToBuffer,
-  getVolume,
-} = require('../helper');
+// const {
+//   bufferToBytes,
+//   bytesToBuffer,
+//   getVolume,
+// } = require('../helper');
 
 class GetFinanceInfo extends BaseParser {
   setParams(market, code) {
     const pkg = Buffer.from('0c1f187600010b000b0010000100', 'hex'); // pkg = bytearray.fromhex(u'0c 1f 18 76 00 01 0b 00 0b 00 10 00 01 00')
-    let pkgArr = bufferToBytes(pkg);
     const pkgParam = bufferpack.pack('<B6s', [market, code]);
-    pkgArr = pkgArr.concat(bufferToBytes(pkgParam)); // pkg.extend(struct.pack(u"<B6s", market, code))
-    this.sendPkg = bytesToBuffer(pkgArr);
+    this.sendPkg = Buffer.concat([pkg, pkgParam]);
     // pkg = Buffer.from('0c4d109c000168006800d002010036303131363602003630313136362e74787400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007499ae470000697f000000000000', 'hex')
     // pkg = Buffer.from('0c4e109c000168006800d002010036303131363602003630313136362e74787400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007499aebf00006907000000000000', 'hex')
     // pkg = Buffer.from('0c51109c000168006800d002010036303131323802003630313132382e74787400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007499bc5100005797000000000000', 'hex')
