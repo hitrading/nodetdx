@@ -88,6 +88,21 @@ class BaseSocketClient {
     setTimeout(() => this.checkHeartbeat(), this.heartbeatInterval);
   }
 
+  async checkQueue() {
+    const firstReq = this.reqQueue[0];
+    if (firstReq && !this.lock) {
+      this.lock = true;
+      const [resolve, target, thisArg, argumentsList] = firstReq;
+      const data = await target.apply(thisArg, argumentsList);
+      this.reqQueue.shift();
+      Promise.resolve().then(() => {
+        this.lock = false;
+        return this.checkQueue();
+      });
+      resolve(data);
+    }
+  }
+
 }
 
 module.exports = BaseSocketClient;
