@@ -9,7 +9,7 @@ const GetSecurityCountCmd = require('./parser/getSecurityCount');
 const GetSecurityList = require('./parser/getSecurityList');
 const GetSecurityQuotesCmd = require('./parser/getSecurityQuotes');
 const GetFinanceInfo = require('./parser/getFinanceInfo');
-const getExRightInfo = require('./parser/getExRightInfo');
+const GetExRightInfo = require('./parser/getExRightInfo');
 const GetSecurityBarsCmd = require('./parser/getSecurityBars');
 const GetIndexBarsCmd = require('./parser/getIndexBars');
 const GetMinuteTimeData = require('./parser/getMinuteTimeData');
@@ -63,7 +63,7 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   async getExRightInfo(market, code) {
-    const cmd = new getExRightInfo(this.client);
+    const cmd = new GetExRightInfo(this.client);
     cmd.setParams(market, code);
     return await cmd.callApi();
   }
