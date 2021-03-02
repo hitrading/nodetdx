@@ -78,10 +78,10 @@ class ExGetInstrumentQuoteList extends BaseParser {
       low,
       lastPrice,
       ,  // 0
-      bid,  // ?
+      buy,  // ?
       totalVol,
       vol,  // ?
-      totalAmount,
+      amount,
       ,  // ?
       ,  // ?
       inner,  // 0
@@ -119,10 +119,10 @@ class ExGetInstrumentQuoteList extends BaseParser {
       high,
       low,
       lastPrice, // 现价
-      bid, // 买入价
+      buy, // 买入价
       totalVol, // 总量
       vol, // 现量
-      totalAmount,
+      amount,
       inner,
       outer,
       bid1,
@@ -153,8 +153,8 @@ class ExGetInstrumentQuoteList extends BaseParser {
   extractFutures(market, code, bodyBuf, datalist, pos) {
     const dataPackFormat = '<IfffffIIIIfIIfIfIIIIIIIIIfIIIIIIIII';
     const [
-      transNum, preSettlementPrice, open, high, low, ask, KaiCang, , totalVol,
-      vol, totalAmount, inner, outer, , openInterest, bid, , , , , bidVol,
+      transNum, preSettlementPrice, open, high, low, sell, openingVol, , totalVol,
+      vol, amount, inner, outer, , openInterest, bid, , , , , bidVol,
       , , , , ask, , , , , askVol
     ] = bufferpack.unpack(dataPackFormat, bodyBuf.slice(pos, pos + 140));
 
@@ -168,11 +168,11 @@ class ExGetInstrumentQuoteList extends BaseParser {
       open,
       high,
       low,
-      ask, // 卖出
+      sell, // 卖出
       openingVol, // 开仓(量)
       totalVol,
       vol,
-      totalAmount,
+      amount,
       inner, // 内盘
       outer, // 外盘
       openInterest, // 持仓量

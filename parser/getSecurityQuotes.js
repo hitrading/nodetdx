@@ -57,8 +57,8 @@ class GetSecurityQuotesCmd extends BaseParser {
     const stocks = [];
 
     for (let i = 0; i < numStock; i++) {
-      let price, lastCloseDiff, openDiff, highDiff, lowDiff, reversedBytes0, reversedBytes1, vol, curVol, amountRaw,
-      amount, sVol, bVol, reversedBytes2, reversedBytes3, bid1, ask1, bidVol1, askVol1, bid2, ask2, bidVol2, askVol2,
+      let price, preCloseDiff, openDiff, highDiff, lowDiff, reversedBytes0, reversedBytes1, totalVol, vol, amountRaw,
+      amount, sellVol, buyVol, reversedBytes2, reversedBytes3, bid1, ask1, bidVol1, askVol1, bid2, ask2, bidVol2, askVol2,
       bid3, ask3, bidVol3, askVol3, bid4, ask4, bidVol4, askVol4, bid5, ask5, bidVol5, askVol5, reversedBytes4,
       reversedBytes5, reversedBytes6, reversedBytes7, reversedBytes8, reversedBytes9, active2;
       // pos = startPosList[i];
@@ -67,7 +67,7 @@ class GetSecurityQuotesCmd extends BaseParser {
       const [market, code, active1] = bufferpack.unpack('<B6sH', bodyBuf.slice(pos, pos + 9));
       pos += 9;
       [price, pos] = getPrice(bodyBuf, pos);
-      [lastCloseDiff, pos] = getPrice(bodyBuf, pos);
+      [preCloseDiff, pos] = getPrice(bodyBuf, pos);
       [openDiff, pos] = getPrice(bodyBuf, pos);
       [highDiff, pos] = getPrice(bodyBuf, pos);
       [lowDiff, pos] = getPrice(bodyBuf, pos);
@@ -85,13 +85,13 @@ class GetSecurityQuotesCmd extends BaseParser {
       // else {
       //   console.log(`${reversedBytes1} !== -${price}`)
       // }
+      [totalVol, pos] = getPrice(bodyBuf, pos);
       [vol, pos] = getPrice(bodyBuf, pos);
-      [curVol, pos] = getPrice(bodyBuf, pos);
       [amountRaw] = bufferpack.unpack('<I', bodyBuf.slice(pos, pos + 4));
       amount = getVolume(amountRaw);
       pos += 4;
-      [sVol, pos] = getPrice(bodyBuf, pos);
-      [bVol, pos] = getPrice(bodyBuf, pos);
+      [sellVol, pos] = getPrice(bodyBuf, pos);
+      [buyVol, pos] = getPrice(bodyBuf, pos);
       [reversedBytes2, pos] = getPrice(bodyBuf, pos);
       [reversedBytes3, pos] = getPrice(bodyBuf, pos);
 
@@ -144,19 +144,19 @@ class GetSecurityQuotesCmd extends BaseParser {
         // code: this.decode(code, 'utf-8'),
         code,
         active1,
-        price: this.calcPrice(price, 0),
-        lastClose: this.calcPrice(price, lastCloseDiff),
+        lastPrice: this.calcPrice(price, 0),
+        preClose: this.calcPrice(price, preCloseDiff),
         open: this.calcPrice(price, openDiff),
         high: this.calcPrice(price, highDiff),
         low: this.calcPrice(price, lowDiff),
         serverTime: this.formatTime(reversedBytes0),
         reversedBytes0, // : bytesToBuffer(reversedBytes0).readUInt32LE(0), // readUInt32BE
         reversedBytes1,
+        totalVol,
         vol,
-        curVol,
         amount,
-        sVol,
-        bVol,
+        sellVol,
+        buyVol,
         reversedBytes2,
         reversedBytes3,
         bid1: this.calcPrice(price, bid1),
