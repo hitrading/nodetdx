@@ -222,7 +222,11 @@ class GetSecurityQuotesCmd extends BaseParser {
   formatTime(timestamp) {
     timestamp = '' + timestamp;
     // console.log(typeof timestamp, timestamp);
-    let time = timestamp.slice(0, -6) + ':';
+    let time = timestamp.slice(0, -6);
+    if (+time < 10) {
+      time = '0' + time;
+    }
+    time += ':';
     const s = timestamp.slice(-6, -4);
     // console.log('time: %s, s: %s', time, s);
     if (+s < 60) {
