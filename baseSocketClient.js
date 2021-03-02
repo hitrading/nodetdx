@@ -8,9 +8,12 @@ class BaseSocketClient {
    * @param {Boolean} useHeartbeat 启用心跳检测
    * @param {Integer} heartbeatInterval 心跳间隔, heartbeatInterval / 1000 秒一个heartbeat
    * @param {Integer} idleTimeout 空闲超时, idleTimeout / 1000 秒不发送请求则断开连接
+   * @param {Integer} maxReconnectTimes 最大重连次数
+   * @param {Integer} reconnectInterval 重连间隔
+   * @param {Boolean} autoSelectBestGateway 自动选择最优网关
    * @param {Function} onTimeout 超时回调函数
    */
-  constructor({ useHeartbeat = true, heartbeatInterval = 30000, onTimeout, idleTimeout = 60000 } = {}) {
+  constructor({ useHeartbeat = true, heartbeatInterval = 30000, onTimeout, idleTimeout = 60000, maxReconnectTimes = 10, reconnectInterval = 3000, autoSelectBestGateway = true } = {}) {
     if (useHeartbeat && heartbeatInterval >= idleTimeout) {
       throw new Error('heartbeatInterval must < idleTimeout');
     }
@@ -18,8 +21,12 @@ class BaseSocketClient {
     this.heartbeatCount = 0;
     this.useHeartbeat = useHeartbeat;
     this.heartbeatInterval = heartbeatInterval;
+    this.maxReconnectTimes = maxReconnectTimes;
+    this.reconnectInterval = reconnectInterval;
+    this.autoSelectBestGateway = autoSelectBestGateway;
     this.onTimeout = onTimeout;
     this.idleTimeout = idleTimeout;
+
     this.reqQueue = []; // 请求队列
 
     const socket = new net.Socket();
@@ -28,17 +35,24 @@ class BaseSocketClient {
     promiseSocket.socket.once('timeout', () => {
       logger.error(`connection is timeout, max idle time is ${this.idleTimeout} ms.`);
       this.onTimeout && this.onTimeout();
+      // TODO: 断线自动重连
     });
 
     this.client = promiseSocket;
   }
 
   /**
-   * @param {String} host 服务器ip 地址
-   * @param {Integer} port 服务器端口
+   * 连接服务器网关
+   * 若传入了host和port参数则使用参数建立连接, 若未传参数并且this.autoSelectBestGateway为true则自动选择最优网关建立连接,
+   * 若既未传参且this.autoSelectBestGateway为false则抛出异常
+   * @param {String} host 服务器ip地址   可选
+   * @param {Integer} port 服务器端口    可选
    */
   async connect(host, port) {
     logger.debug('connecting to server %s on port %d', host, port);
+    // TODO: 自动选择最优网关
+    this.host = host;
+    this.port = port;
 
     try {
       await this.client.connect({ host, port });

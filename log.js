@@ -21,7 +21,7 @@ const dict = {
   NONE
 };
 
-let level = NONE;
+let level = ERROR;
 
 function printNow() {
   process.stdout.write(`[${formatDatetime(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS')}] `);
