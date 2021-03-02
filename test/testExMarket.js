@@ -1,7 +1,7 @@
 const { TdxExMarketApi, logger } = require('../index');
 
 logger.level = 'INFO';
-const api = new TdxExMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
+const api = new TdxExMarketApi({ heartbeatInterval: 5000, idleTimeout: 10000 });
 
 (async() => {
   if (await api.connect('106.14.95.149', 7727)) { // 112.74.214.43: 7727
@@ -27,15 +27,15 @@ const api = new TdxExMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 })
     // logger.info(await api.getHistoryTransactionData(47, "IFL0", 20200222));
     // logger.info(await api.getHistoryTransactionData(47, 'IFL0', 20200222));
 
-    // logger.info("查询k线")
-    // logger.info(await api.getInstrumentBars(9, 8, "10000843"))
-    // const data = await api.getInstrumentBars(8, 47, "IFL0")
-    // logger.info(JSON.stringify(data.slice(-10)))
+    logger.info("查询k线")
+    logger.info(await api.getInstrumentBars(9, 8, "10000843"))
+    const data = await api.getInstrumentBars(8, 47, "IFL0")
+    logger.info(JSON.stringify(data.slice(-10)))
     // logger.info("查询代码列表")
     // logger.info(await api.getInstrumentInfo(10000, 98))
 
-    logger.info("查询行情列表")
-    logger.info(await api.getInstrumentQuoteList(47, 2))
+    // logger.info("查询行情列表")
+    // logger.info(await api.getInstrumentQuoteList(47, 2))
 
     // logger.info("按日期区间查询K线")
     // logger.info((await api.getHistoryInstrumentBarsRange(47, "IFL0", 20210220, 20210224)).reverse())

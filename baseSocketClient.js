@@ -1,6 +1,7 @@
 const net = require('net');
 const { PromiseSocket, TimeoutError } = require('promise-socket');
 const logger = require('./log');
+const { sleep } = require('./helper');
 
 class BaseSocketClient {
   /**
@@ -13,7 +14,7 @@ class BaseSocketClient {
    * @param {Boolean} autoSelectBestGateway 自动选择最优网关
    * @param {Function} onTimeout 超时回调函数
    */
-  constructor({ useHeartbeat = true, heartbeatInterval = 30000, onTimeout, idleTimeout = 60000, maxReconnectTimes = 10, reconnectInterval = 3000, autoSelectBestGateway = true } = {}) {
+  constructor({ useHeartbeat = true, heartbeatInterval = 15000, onTimeout, idleTimeout = 30000, maxReconnectTimes = 5, reconnectInterval = 3000, autoSelectBestGateway = true } = {}) {
     if (useHeartbeat && heartbeatInterval >= idleTimeout) {
       throw new Error('heartbeatInterval must < idleTimeout');
     }
@@ -27,6 +28,7 @@ class BaseSocketClient {
     this.onTimeout = onTimeout;
     this.idleTimeout = idleTimeout;
 
+    this.reconnectTimes = 0; // 重连次数
     this.reqQueue = []; // 请求队列
 
     const socket = new net.Socket();
@@ -35,7 +37,7 @@ class BaseSocketClient {
     promiseSocket.socket.once('timeout', () => {
       logger.error(`connection is timeout, max idle time is ${this.idleTimeout} ms.`);
       this.onTimeout && this.onTimeout();
-      // TODO: 断线自动重连
+      this.tryReconnect();
     });
 
     this.client = promiseSocket;
@@ -49,22 +51,39 @@ class BaseSocketClient {
    * @param {Integer} port 服务器端口    可选
    */
   async connect(host, port) {
-    logger.debug('connecting to server %s on port %d', host, port);
-    // TODO: 自动选择最优网关
+    if (this.autoSelectBestGateway && !host && !port) {
+      const gateways = await this.doPing();
+      const firstGatewat = gateways[0];
+      if (firstGatewat) {
+        let time;
+        [ , host, port, time ] = firstGatewat;
+        logger.debug('auto select best gateway is: %s, %dms.', host + ':' + port, time);
+      }
+    }
+
     this.host = host;
     this.port = port;
 
+    logger.debug('connecting to server %s on port %d', host, port);
+
+    let connected;
+
     try {
       await this.client.connect({ host, port });
+      this.reconnectTimes = 0;
+      connected = true;
     }
     catch(e) {
-      if (e instanceof TimeoutError) {
-        logger.error('socket timeout when connect');
-      }
-      throw e;
+      // logger.error('connect to server %s on port %d failed: %s.', host, port, e instanceof TimeoutError ? 'Timeout' : e.message);
+      logger.error(e);
     }
 
-    logger.debug("connected!");
+    if (!connected) {
+      this.reconnectTimes++;
+      return await this.tryReconnect();
+    }
+
+    logger.debug("socket connected.");
 
     if (this.needSetup) {
       await this.setup();
@@ -74,7 +93,63 @@ class BaseSocketClient {
 
     this.useHeartbeat && this.checkHeartbeat();
 
-    return this;
+    return connected;
+  }
+
+  async ping(host, port) {
+    const socket = new net.Socket();
+    const promiseSocket = new PromiseSocket(socket);
+    promiseSocket.setTimeout(100);
+    promiseSocket.socket.once('timeout', () => {
+      logger.error('ping timeout %s', host + ':' + port);
+    });
+    const t = Date.now();
+    try {
+      await promiseSocket.connect({ host, port });
+      const time = Date.now() - t;
+      await promiseSocket.destroy();
+      logger.debug('ping %s, %dms', host + ':' + port, time);
+      return time;
+    }
+    catch(e) {}
+  }
+
+  async getGateways(hosts) {
+    const accessibleGateways = [];
+
+    for (let gateway of hosts) {
+      const [ , host, port ] = gateway;
+      const time = await this.ping(host, port);
+      if (typeof time === 'number') {
+        accessibleGateways.push([ ...gateway, time ]);
+      }
+    }
+
+    accessibleGateways.sort((a, b) => {
+      return a[3] - b[3] < 0 ? -1 : 1;
+    });
+
+    return accessibleGateways;
+  }
+
+  async tryReconnect() {
+    if (this.reconnectInterval < 0 || !this.host || !this.port) {
+      return;
+    }
+
+    // 达到最大重连次数
+    if (this.reconnectTimes >= this.maxReconnectTimes) {
+      if (this.autoSelectBestGateway) { // 重新选择最优服务器后再尝试重连
+        return this.connect();
+      }
+      else { // 尝试重连失败
+        logger.error('failed to connect to server %s on %d, tried %d times.', this.host, this.port, this.maxReconnectTimes);
+        return;
+      }
+    }
+
+    await sleep(this.reconnectInterval);
+    return this.connect(this.host, this.port);
   }
 
   disconnect() {

@@ -19,7 +19,12 @@ const GetTransactionData = require('./parser/getTransactionData');
 const GetCompanyInfoCategory = require('./parser/getCompanyInfoCategory');
 const GetCompanyInfoContent = require('./parser/getCompanyInfoContent');
 
+const { marketHosts } = require('./config/hosts');
 class TdxMarketApi extends BaseSocketClient {
+
+  doPing() {
+    return this.getGateways(marketHosts);
+  }
 
   doHeartbeat() {
     return this.getSecurityCount(Math.round(Math.random()));

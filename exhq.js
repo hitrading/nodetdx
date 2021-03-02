@@ -13,7 +13,12 @@ const ExGetHistoryMinuteTimeData = require('./parser/exGetHistoryMinuteTimeData'
 const ExGetHistoryTransactionData = require('./parser/exGetHistoryTransactionData');
 const ExGetHistoryInstrumentBarsRange = require('./parser/exGetHistoryInstrumentBarsRange');
 
+const { exMarketHosts } = require('./config/hosts');
 class TdxExMarketApi extends BaseSocketClient {
+
+  doPing() {
+    return this.getGateways(exMarketHosts);
+  }
 
   doHeartbeat() {
     return this.getInstrumentCount();

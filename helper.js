@@ -223,6 +223,12 @@ function padStart(str, count, fillStr = '0') {
   }
 }
 
+function sleep(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
+
 module.exports = {
   hexToBytes,
   bytesToHex,
@@ -234,5 +240,6 @@ module.exports = {
   getDatetime,
   getTime,
   formatDatetime,
-  padStart
+  padStart,
+  sleep
 };
