@@ -31,12 +31,17 @@ class BaseSocketClient {
     this.reconnectTimes = 0; // 重连次数
     this.reqQueue = []; // 请求队列
 
+    this._initClient();
+  }
+
+  _initClient() {
     const socket = new net.Socket();
     const promiseSocket = new PromiseSocket(socket);
     promiseSocket.setTimeout(this.idleTimeout);
     promiseSocket.socket.once('timeout', () => {
       logger.error(`connection is timeout, max idle time is ${this.idleTimeout} ms.`);
       this.onTimeout && this.onTimeout();
+      this._initClient(); // timeout后promiseSocket被destroy掉了, 需要重建socket
       this.tryReconnect();
     });
 
