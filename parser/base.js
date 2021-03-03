@@ -109,7 +109,15 @@ class BaseParser {
 
       this.client.lastAckTime = Date.now(); // 记录最后一次请求的时间戳, 用于计算心跳包触发时间
 
-      return this.parseResponse(bodyBuf);
+      let parsedData;
+      try {
+        parsedData = this.parseResponse(bodyBuf);
+      }
+      catch(e) {
+        logger.error('failed parse response.');
+        logger.error(e);
+      }
+      return parsedData;
     }
     else {
       logger.debug('headBuf is not 0x10');

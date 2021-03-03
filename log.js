@@ -23,32 +23,32 @@ const dict = {
 
 let level = ERROR;
 
-function printNow() {
-  process.stdout.write(`[${formatDatetime(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS')}] `);
+function printNow(prefix = '') {
+  process.stdout.write(`[${formatDatetime(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS')}]${prefix} `);
 }
 
 module.exports = {
   debug: function(...args) {
     if (level > INFO) {
-      printNow();
+      printNow('[DEBUG]');
       console.debug(...args);
     }
   },
   info: function(...args) {
     if (level > WARN) {
-      printNow();
+      printNow('[INFO]');
       console.info(...args);
     }
   },
   warn: function(...args) {
     if (level > ERROR) {
-      printNow();
+      printNow('[WARN]');
       console.warn(...args);
     }
   },
   error: function(...args) {
     if (level > NONE) {
-      printNow();
+      printNow('[ERROR]');
       console.error(...args);
     }
   },

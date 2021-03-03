@@ -122,33 +122,80 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   /**
-   * 查询K线
+   * 按日期查询证券K线
    * @param {Integer} category 0 5分钟K, 1 15分钟K, 2 30分钟K, 3 1小时K, 4 日K, 5 周K, 6 月K, 7 1分钟K, 8 1分钟K, 9 日K, 10 季K, 11 年K
+   * @param {Integer} marketCode
    * @param {String} code
    * @param {String} startDatetime
    * @param {String} endDatetime
    */
-  async findBars(category = 9, code, startDatetime, endDatetime) {
+  async findSecurityBars(category = 9, marketCode, code, startDatetime, endDatetime) {
     // 具体详情参见 https://github.com/rainx/pytdx/issues/5
     // 具体详情参见 https://github.com/rainx/pytdx/issues/21
 
     // https://github.com/rainx/pytdx/issues/33
     // 0 - 深圳， 1 - 上海
-    if (startDatetime && /^\d{4}-\d{2}-\d{2}$/.test(startDatetime)) { // 开始时间只有日期没有时间, 在后面加上' 00:00'
-      startDatetime += ' 00:00';
-    }
 
-    if (endDatetime && /^\d{4}-\d{2}-\d{2}$/.test(endDatetime)) { // 结束时间只有日期没有时间, 在后面加上' 15:00'
-      endDatetime += ' 15:00';
-    }
+    const startTimestamp = calcStartTimestamp(startDatetime);
+    const endTimestamp = calcEndTimestamp(endDatetime);
 
-    const startTimestamp = new Date(startDatetime).getTime();
-    const endTimestamp = endDatetime ? new Date(endDatetime).getTime() : Date.now();
-    const marketCode = getMarketCode(code);
     let bars = [];
     let i = 0;
     while(true) {
       let list = await this.getSecurityBars(category, marketCode, code, i++ * 800, 800); // i++ * 8 => i * 8; i++;
+
+      if (!list) {
+        break;
+      }
+
+      if (list.length) {
+        const firstBar = list[0];
+        const lastBar = list[list.length - 1];
+        const firstTimestamp = new Date(firstBar.datetime).getTime();
+        const lastTimestamp = new Date(lastBar.datetime).getTime();
+
+        if (startTimestamp > lastTimestamp || firstTimestamp > endTimestamp) {
+          break;
+        }
+
+        list = list.filter(bar => {
+          const timestamp = new Date(bar.datetime).getTime();
+          return timestamp >= startTimestamp && timestamp <= endTimestamp;
+        });
+        bars = bars.concat(list);
+      }
+    }
+
+    return bars;
+  }
+
+  /**
+   * 按日期查询指数K线
+   * @param {Integer} category 0 5分钟K, 1 15分钟K, 2 30分钟K, 3 1小时K, 4 日K, 5 周K, 6 月K, 7 1分钟K, 8 1分钟K, 9 日K, 10 季K, 11 年K
+   * @param {Integer} marketCode
+   * @param {String} code
+   * @param {String} startDatetime
+   * @param {String} endDatetime
+   */
+  async findIndexBars(category = 9, marketCode, code, startDatetime, endDatetime) {
+    // 具体详情参见 https://github.com/rainx/pytdx/issues/5
+    // 具体详情参见 https://github.com/rainx/pytdx/issues/21
+
+    // https://github.com/rainx/pytdx/issues/33
+    // 0 - 深圳， 1 - 上海
+
+    const startTimestamp = calcStartTimestamp(startDatetime);
+    const endTimestamp = calcEndTimestamp(endDatetime);
+
+    let bars = [];
+    let i = 0;
+    while(true) {
+      let list = await this.getIndexBars(category, marketCode, code, i++ * 800, 800); // i++ * 8 => i * 8; i++;
+
+      if (!list) {
+        break;
+      }
+
       if (list.length) {
         const firstBar = list[0];
         const lastBar = list[list.length - 1];
@@ -172,14 +219,20 @@ class TdxMarketApi extends BaseSocketClient {
 
 }
 
-function getMarketCode(code) {
-  return code[0] === '6' ? 1 : 0; // 新版一劳永逸偷懒写法zzz
-  // const firstCodeChar = code[0];
-  // const threeCodeChar = code.slice(0, 3);
-  // if (['5', '6', '9'].includes(firstCodeChar) || ['009', '126', '110', '201', '202', '203', '204'].includes(threeCodeChar)) {
-  //   return 1;
-  // }
-  // return 0;
+function calcStartTimestamp(startDatetime) {
+  if (startDatetime && /^\d{4}-\d{2}-\d{2}$/.test(startDatetime)) { // 开始时间只有日期没有时间, 在后面加上' 00:00'
+    startDatetime += ' 00:00';
+  }
+
+  return new Date(startDatetime).getTime();
+}
+
+function calcEndTimestamp(endDatetime) {
+  if (endDatetime && /^\d{4}-\d{2}-\d{2}$/.test(endDatetime)) { // 结束时间只有日期没有时间, 在后面加上' 15:00'
+    endDatetime += ' 15:00';
+  }
+
+  return endDatetime ? new Date(endDatetime).getTime() : Date.now();
 }
 
 Object.getOwnPropertyNames(TdxMarketApi.prototype).forEach(name => {

@@ -1,6 +1,6 @@
 {
   "name": "nodetdx",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "a tdx interface implemention by pure nodejs",
   "main": "index.js",
   "author": "",
