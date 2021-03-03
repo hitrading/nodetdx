@@ -11,10 +11,22 @@ class BaseSocketClient {
    * @param {Integer} idleTimeout 空闲超时, idleTimeout / 1000 秒不发送请求则断开连接
    * @param {Integer} maxReconnectTimes 最大重连次数
    * @param {Integer} reconnectInterval 重连间隔
+   * @param {Integer} pingTimeout ping超时
    * @param {Boolean} autoSelectBestGateway 自动选择最优网关
    * @param {Function} onTimeout 超时回调函数
    */
-  constructor({ useHeartbeat = true, heartbeatInterval = 15000, onTimeout, idleTimeout = 30000, maxReconnectTimes = 5, reconnectInterval = 3000, autoSelectBestGateway = true } = {}) {
+  constructor(
+    {
+      useHeartbeat = true,
+      heartbeatInterval = 15000,
+      onTimeout,
+      idleTimeout = 30000,
+      maxReconnectTimes = 5,
+      reconnectInterval = 3000,
+      pingTimeout = 100,
+      autoSelectBestGateway = true
+    } = {}
+  ) {
     if (useHeartbeat && heartbeatInterval >= idleTimeout) {
       throw new Error('heartbeatInterval must < idleTimeout');
     }
@@ -27,6 +39,7 @@ class BaseSocketClient {
     this.autoSelectBestGateway = autoSelectBestGateway;
     this.onTimeout = onTimeout;
     this.idleTimeout = idleTimeout;
+    this.pingTimeout = pingTimeout;
 
     this.reconnectTimes = 0; // 重连次数
     this.reqQueue = []; // 请求队列
@@ -35,6 +48,9 @@ class BaseSocketClient {
   }
 
   _initClient() {
+    if (this.client) {
+      this.client.destroy();
+    }
     const socket = new net.Socket();
     const promiseSocket = new PromiseSocket(socket);
     promiseSocket.setTimeout(this.idleTimeout);
@@ -62,16 +78,17 @@ class BaseSocketClient {
       if (firstGatewat) {
         let time;
         [ , host, port, time ] = firstGatewat;
-        logger.debug('auto select best gateway is: %s, %dms.', host + ':' + port, time);
+        logger.info('auto select best gateway is: %s, %dms.', host + ':' + port, time);
       }
     }
 
     this.host = host;
     this.port = port;
 
-    logger.debug('connecting to server %s on port %d', host, port);
+    logger.info('connecting to server %s on port %d', host, port);
 
     let connected;
+    const t = Date.now();
 
     try {
       await this.client.connect({ host, port });
@@ -79,7 +96,6 @@ class BaseSocketClient {
       connected = true;
     }
     catch(e) {
-      // logger.error('connect to server %s on port %d failed: %s.', host, port, e instanceof TimeoutError ? 'Timeout' : e.message);
       logger.error(e);
     }
 
@@ -88,7 +104,7 @@ class BaseSocketClient {
       return await this.tryReconnect();
     }
 
-    logger.debug("socket connected.");
+    logger.info('socket connected, spent %d ms.', Date.now() - t);
 
     if (this.needSetup) {
       await this.setup();
@@ -104,7 +120,7 @@ class BaseSocketClient {
   async ping(host, port) {
     const socket = new net.Socket();
     const promiseSocket = new PromiseSocket(socket);
-    promiseSocket.setTimeout(100);
+    promiseSocket.setTimeout(this.pingTimeout);
     promiseSocket.socket.once('timeout', () => {
       logger.error('ping timeout %s', host + ':' + port);
     });
@@ -112,8 +128,8 @@ class BaseSocketClient {
     try {
       await promiseSocket.connect({ host, port });
       const time = Date.now() - t;
-      await promiseSocket.destroy();
-      logger.debug('ping %s, %dms', host + ':' + port, time);
+      promiseSocket.destroy();
+      logger.info('ping %s, %dms', host + ':' + port, time);
       return time;
     }
     catch(e) {}
@@ -159,9 +175,8 @@ class BaseSocketClient {
 
   disconnect() {
     if (this.client) {
-      logger.debug('disconnecting');
       this.client.destroy();
-      logger.debug('disconnected');
+      logger.info('disconnected');
     }
   }
 
