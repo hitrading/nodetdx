@@ -144,7 +144,7 @@ class TdxMarketApi extends BaseSocketClient {
     while(true) {
       let list = await this.getSecurityBars(category, marketCode, code, i++ * 800, 800); // i++ * 8 => i * 8; i++;
 
-      if (!list) {
+      if (!list || !list.length) {
         break;
       }
 
@@ -192,7 +192,7 @@ class TdxMarketApi extends BaseSocketClient {
     while(true) {
       let list = await this.getIndexBars(category, marketCode, code, i++ * 800, 800); // i++ * 8 => i * 8; i++;
 
-      if (!list) {
+      if (!list || !list.length) {
         break;
       }
 
