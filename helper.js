@@ -244,7 +244,7 @@ function parseSymbol(symbol) {
   const data = {};
 
   if (arr) {
-    data.code = arr[1];
+    data.code = arr[1].toUpperCase(); // 通达信扩展行情的期货合约品种字母必须全部为大写, 比如rb2105必须转换为RB2105
     data.exchangeCode = arr[2];
 
     if (arr[3]) {
@@ -258,24 +258,43 @@ function parseSymbol(symbol) {
   return data;
 }
 
+const EXCHANGEID_MAP = {
+  SH: 1,
+  SZ: 0,
+  DCE: 29,
+  CZCE: 28,
+  SHFE: 30,
+  CFFEX: 47,
+  'O@CZCE': 4, // 郑州商品期权
+  'O@DCE': 5,
+  'O@SHFE': 6,
+  'O@CFFEX': 7,
+  'O@SH': 8,
+  'O@SZ': 9,
+  MFC: 60, // 主力期货合约, main future contract
+};
+
 // 只有SH和SZ两个合法的exchangeCode
 function getExchangeId(exchangeCode) {
-  let exchangeId;
-  switch(exchangeCode) {
-    case 'SH': {
-      exchangeId = 1;
-      break;
-    }
-    case 'SZ': {
-      exchangeId = 0;
-      break;
-    }
-    default: {
-      throw new Error(`exchangeCode ${exchangeCode} is not valid value.`)
-    }
-  }
+  return EXCHANGEID_MAP[exchangeCode];
+}
 
-  return exchangeId;
+const CATEGORYID_MAP = {
+  DCE: 3,
+  CZCE: 3,
+  SHFE: 3,
+  CFFEX: 3,
+  'O@CZCE': 12, // 郑州商品期权
+  'O@DCE': 12,
+  'O@SHFE': 12,
+  'O@CFFEX': 12,
+  'O@SH': 12,
+  'O@SZ': 12,
+  MFC: 3, // 主力期货合约, main future contract
+};
+
+function getCategoryId(exchangeCode) {
+  return CATEGORYID_MAP[exchangeCode];
 }
 
 const PERIOD_MAP = {
@@ -301,6 +320,22 @@ function getPeriodValue(name) {
   return PERIOD_MAP[name];
 }
 
+function calcStartTimestamp(startDatetime) {
+  if (startDatetime && /^\d{4}-\d{2}-\d{2}$/.test(startDatetime)) { // 开始时间只有日期没有时间, 在后面加上' 00:00'
+    startDatetime += ' 00:00';
+  }
+
+  return new Date(startDatetime).getTime();
+}
+
+function calcEndTimestamp(endDatetime) {
+  if (endDatetime && /^\d{4}-\d{2}-\d{2}$/.test(endDatetime)) { // 结束时间只有日期没有时间, 在后面加上' 15:00'
+    endDatetime += ' 15:00';
+  }
+
+  return endDatetime ? new Date(endDatetime).getTime() : Date.now();
+}
+
 module.exports = {
   hexToBytes,
   bytesToHex,
@@ -316,5 +351,8 @@ module.exports = {
   sleep,
   parseSymbol,
   getExchangeId,
-  getPeriodValue
+  getPeriodValue,
+  getCategoryId,
+  calcStartTimestamp,
+  calcEndTimestamp
 };

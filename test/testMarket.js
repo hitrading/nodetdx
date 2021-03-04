@@ -42,43 +42,43 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // const bars = await api.findSecurityBars('D', '000001.SZ', '2021-02-19', '2021-02-26')
     // logger.info(JSON.stringify(bars));
     // api.disconnect()
-    let c = 0;
+    // let c = 0;
 
-    async function getSecurityQuotes () {
-      c++;
-      const t = Date.now();
-      const quotes = await api.getSecurityQuotes('600300.SH');
-      const { price, bid1, ask1, bidVol1, askVol1, serverTime } = quotes[0]
-      logger.info(JSON.stringify({
-        price,
-        bid1,
-        ask1,
-        bidVol1,
-        askVol1,
-        serverTime,
-        'rsp - req': Date.now() - t,
-        c
-      }));
+    // async function getSecurityQuotes () {
+    //   c++;
+    //   const t = Date.now();
+    //   const quotes = await api.getSecurityQuotes('600300.SH');
+    //   const { price, bid1, ask1, bidVol1, askVol1, serverTime } = quotes[0]
+    //   logger.info(JSON.stringify({
+    //     price,
+    //     bid1,
+    //     ask1,
+    //     bidVol1,
+    //     askVol1,
+    //     serverTime,
+    //     'rsp - req': Date.now() - t,
+    //     c
+    //   }));
 
-      if (c < 20) {
-        setTimeout(() => getSecurityQuotes(), 1000);
-      }
-      else {
-        c = 0;
-        setTimeout(() => getSecurityQuotes(), 200000);
-      }
+    //   if (c < 20) {
+    //     setTimeout(() => getSecurityQuotes(), 1000);
+    //   }
+    //   else {
+    //     c = 0;
+    //     setTimeout(() => getSecurityQuotes(), 200000);
+    //   }
 
-      // getSecurityQuotes();
-    }
+    //   // getSecurityQuotes();
+    // }
 
-    getSecurityQuotes();
+    // getSecurityQuotes();
 
     // api.getSecurityQuotes('600520.SH').then(quote => console.log(quote));
     // api.getSecurityQuotes('600300.SH').then(quote => console.log(quote));
     // api.getSecurityQuotes('000001.SZ').then(quote => console.log(quote));
 
-    // api.findIndexBars('D', '000001.SH', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 上证指数
-    // api.findSecurityBars('D', '000001.SZ', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 中国平安
+    api.findIndexBars('D', '000001.SH', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 上证指数
+    api.findSecurityBars('D', '000001.SZ', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 中国平安
 
     let st = Date.now();
 

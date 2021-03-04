@@ -55,8 +55,8 @@ class ExGetInstrumentBars extends BaseParser {
     for (let i = 0; i < count; i++) {
       let year, month, day, hour, minute;
       [ year, month, day, hour, minute, pos ] = getDatetime(this.category, bodyBuf, pos);
-      const [ open, high, low, close, position, trade, price ] = bufferpack.unpack('<ffffIIf', bodyBuf.slice(pos, pos + 28));
-      const [ amount ] = bufferpack.unpack('<f', bodyBuf.slice(pos + 16, pos + 20));
+      const [ open, high, low, close, openInterest, vol, settlementPrice ] = bufferpack.unpack('<ffffIIf', bodyBuf.slice(pos, pos + 28));
+      // const [ amount ] = bufferpack.unpack('<I', bodyBuf.slice(pos + 16, pos + 20));
 
       pos += 28;
 
@@ -65,16 +65,16 @@ class ExGetInstrumentBars extends BaseParser {
         high,
         low,
         close,
-        position,
-        trade,
-        price,
+        openInterest,
+        vol, // 当查询的是日K线的时候这里的vol似乎需要乘100，但即使如此也不精确啊
+        settlementPrice,
         year,
         month,
         day,
         hour,
         minute,
         datetime: formatDatetime(year, month, day, hour, minute, 'yyyy-MM-dd hh:mm:ss'),
-        amount
+        // amount
       });
     }
 

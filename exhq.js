@@ -14,6 +14,7 @@ const ExGetHistoryTransactionData = require('./parser/exGetHistoryTransactionDat
 const ExGetHistoryInstrumentBarsRange = require('./parser/exGetHistoryInstrumentBarsRange');
 
 const { exMarketHosts } = require('./config/hosts');
+const { parseSymbol, getExchangeId, getPeriodValue, getCategoryId, calcStartTimestamp, calcEndTimestamp } = require('./helper');
 class TdxExMarketApi extends BaseSocketClient {
 
   doPing() {
@@ -40,49 +41,56 @@ class TdxExMarketApi extends BaseSocketClient {
     return await cmd.callApi();
   }
 
-  async getInstrumentQuote(market, code) {
+  async getInstrumentQuote(symbol) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new ExGetInstrumentQuote(this.client);
-    cmd.setParams(market, code);
+    cmd.setParams(exchangeId, code);
     return await cmd.callApi();
   }
 
-  async getInstrumentBars(category, market, code, start = 0, count = 700) {
+  async getInstrumentBars(period, symbol, start = 0, count = 700) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new ExGetInstrumentBars(this.client);
-    cmd.setParams(category, market, code, start, count);
+    cmd.setParams(getPeriodValue(period), exchangeId, code, start, count);
     return await cmd.callApi();
   }
 
-  async getMinuteTimeData(market, code) {
+  async getMinuteTimeData(symbol) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new ExGetMinuteTimeData(this.client);
-    cmd.setParams(market, code)
+    cmd.setParams(exchangeId, code)
     return await cmd.callApi();
   }
 
 
-  async getHistoryMinuteTimeData(market, code, date) {
+  async getHistoryMinuteTimeData(symbol, date) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new ExGetHistoryMinuteTimeData(this.client);
-    cmd.setParams(market, code, date);
+    cmd.setParams(exchangeId, code, date);
     return await cmd.callApi();
   }
 
 
-  async getTransactionData(market, code, start = 0, count = 1800) {
+  async getTransactionData(symbol, start = 0, count = 1800) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new ExGetTransactionData(this.client);
-    cmd.setParams(market, code, start, count);
+    cmd.setParams(exchangeId, code, start, count);
     return await cmd.callApi();
   }
 
 
-  async getHistoryTransactionData(market, code, date, start = 0, count = 1800) {
+  async getHistoryTransactionData(symbol, date, start = 0, count = 1800) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new ExGetHistoryTransactionData(this.client);
-    cmd.setParams(market, code, date, start, count);
+    cmd.setParams(exchangeId, code, date, start, count);
     return await cmd.callApi();
   }
 
 
-  async getHistoryInstrumentBarsRange(market, code, start, end) {
+  async getHistoryInstrumentBarsRange(symbol, start, end) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new ExGetHistoryInstrumentBarsRange(this.client);
-    cmd.setParams(market, code, start, end);
+    cmd.setParams(exchangeId, code, start, end);
     return await cmd.callApi();
   }
 
@@ -94,10 +102,60 @@ class TdxExMarketApi extends BaseSocketClient {
   }
 
 
-  async getInstrumentQuoteList(market, category, start = 0, count = 80) {
+  async getInstrumentQuoteList(exchangeCode, start = 0, count = 80) {
+    const exchangeId = getExchangeId(exchangeCode);
+    const categoryId = getCategoryId(exchangeCode);
     const cmd = new ExGetInstrumentQuoteList(this.client);
-    cmd.setParams(market, category, start, count);
+    cmd.setParams(exchangeId, categoryId, start, count);
     return await cmd.callApi();
+  }
+
+  /**
+   * 按日期查询指数K线
+   * TODO 期货行情的时间需要做特殊处理
+   * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
+   * @param {String} symbol
+   * @param {String} startDatetime
+   * @param {String} endDatetime
+   */
+  async findInstrumentBars(period = 'D', symbol, startDatetime, endDatetime) {
+    // 具体详情参见 https://github.com/rainx/pytdx/issues/5
+    // 具体详情参见 https://github.com/rainx/pytdx/issues/21
+
+    // https://github.com/rainx/pytdx/issues/33
+    // 0 - 深圳， 1 - 上海
+
+    const startTimestamp = calcStartTimestamp(startDatetime);
+    const endTimestamp = calcEndTimestamp(endDatetime);
+
+    let bars = [];
+    let i = 0;
+    while(true) {
+      let list = await this.getInstrumentBars(period, symbol, i++ * 800, 800); // i++ * 8 => i * 8; i++;
+
+      if (!list || !list.length) {
+        break;
+      }
+
+      if (list.length) {
+        const firstBar = list[0];
+        const lastBar = list[list.length - 1];
+        const firstTimestamp = new Date(firstBar.datetime).getTime();
+        const lastTimestamp = new Date(lastBar.datetime).getTime();
+
+        if (startTimestamp > lastTimestamp || firstTimestamp > endTimestamp) {
+          break;
+        }
+
+        list = list.filter(bar => {
+          const timestamp = new Date(bar.datetime).getTime();
+          return timestamp >= startTimestamp && timestamp <= endTimestamp;
+        });
+        bars = bars.concat(list);
+      }
+    }
+
+    return bars;
   }
 
 }

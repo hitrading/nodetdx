@@ -56,7 +56,7 @@ class ExGetHistoryInstrumentBarsRange extends BaseParser {
     // print(hexdump.hexdump(body_buf[20: 20+ret_count*32]))
     // global raw_li
     for (let i = 0; i < count; i++) {
-      const [ d1, d2, open, high, low, close, position, trade, settlementPrice ] = bufferpack.unpack('<HHffffIIf', bodyBuf.slice(pos, pos + 32));
+      const [ d1, d2, open, high, low, close, openInterest, vol, settlementPrice ] = bufferpack.unpack('<HHffffIIf', bodyBuf.slice(pos, pos + 32));
       pos += 32;
       const [ year, month, day ] = this.parseDate(d1);
       const [ hour, minute ] = this.parseTime(d2);
@@ -72,8 +72,8 @@ class ExGetHistoryInstrumentBarsRange extends BaseParser {
         high,
         low,
         close,
-        position,
-        trade,
+        openInterest,
+        vol,
         settlementPrice
       });
     }

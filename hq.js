@@ -20,7 +20,7 @@ const GetCompanyInfoCategory = require('./parser/getCompanyInfoCategory');
 const GetCompanyInfoContent = require('./parser/getCompanyInfoContent');
 
 const { marketHosts } = require('./config/hosts');
-const { parseSymbol, getExchangeId, getPeriodValue } = require('./helper');
+const { parseSymbol, getExchangeId, getPeriodValue, calcStartTimestamp, calcEndTimestamp } = require('./helper');
 const exchangeIds = ['SH', 'SZ'];
 class TdxMarketApi extends BaseSocketClient {
 
@@ -248,22 +248,6 @@ class TdxMarketApi extends BaseSocketClient {
     return bars;
   }
 
-}
-
-function calcStartTimestamp(startDatetime) {
-  if (startDatetime && /^\d{4}-\d{2}-\d{2}$/.test(startDatetime)) { // 开始时间只有日期没有时间, 在后面加上' 00:00'
-    startDatetime += ' 00:00';
-  }
-
-  return new Date(startDatetime).getTime();
-}
-
-function calcEndTimestamp(endDatetime) {
-  if (endDatetime && /^\d{4}-\d{2}-\d{2}$/.test(endDatetime)) { // 结束时间只有日期没有时间, 在后面加上' 15:00'
-    endDatetime += ' 15:00';
-  }
-
-  return endDatetime ? new Date(endDatetime).getTime() : Date.now();
 }
 
 Object.getOwnPropertyNames(TdxMarketApi.prototype).forEach(name => {

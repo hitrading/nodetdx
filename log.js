@@ -24,7 +24,7 @@ const dict = {
 let level = ERROR;
 
 function printNow(prefix = '') {
-  process.stdout.write(`[${formatDatetime(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS')}]${prefix} `);
+  process.stdout.write(`[${formatDatetime(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS')}] ${prefix} `);
 }
 
 module.exports = {
