@@ -64,7 +64,7 @@
 首先需要引入
 
 ```javascript
-const { TdxMarketApi, MARKET_SH, MARKET_SZ } = require('nodetdx')
+const { TdxMarketApi } = require('nodetdx')
 ```
 
 然后，创建对象
@@ -99,7 +99,7 @@ if (await api.connect('119.147.212.81', 7709)) {
 
 如：
 ```javascript
-await api.getSecurityQuotes([[0, '000001'], [1, '600300']])
+await api.getSecurityQuotes('000001.SZ', '600300.SH')
 ```
 
 #### 2 : 获取k线
@@ -128,19 +128,19 @@ K线种类
 如： 
 
 ```javascript
-await api.getSecurityBars(9, 0, '000001', 0, 100)
+await api.getSecurityBars('D', '000001.SZ', 0, 100)
 ```
 
 #### 3 : 获取市场股票数量
-0 - 深圳， 1 - 上海
+'SZ' - 深圳， 'SH' - 上海
 ```javascript
-await api.getSecurityCount(0)
+await api.getSecurityCount('SH')
 ```
 #### 4 : 获取股票列表
-参数：市场代码, 起始位置， 数量  如： 0,0 或 1,100
+参数：市场代码, 起始位置， 数量  如： 'SH',0 或 'SH',100
 
 ```javascript
-await api.getSecurityList(1, 0)
+await api.getSecurityList('SH', 0)
 ```
 
 #### 5 : 获取指数k线
@@ -168,60 +168,58 @@ K线种类
 如： 
 
 ```javascript
-await api.getIndexBars(9,1, '000001', 1, 2)
+await api.getIndexBars('D', '000001.SH', 1, 2)
 ```
 #### 6 : 查询分时行情
-参数：市场代码， 股票代码， 如： 0,000001 或 1,600300
+参数：股票代码， 如： '000001.SZ' 或 '600300.SH'
 ```javascript
-await api.getMinuteTimeData(1, '600300')
+await api.getMinuteTimeData('600300.SH')
 ```
 #### 7 : 查询历史分时行情
-参数：市场代码， 股票代码，时间 如： 0,000001,20161209 或 1,600300,20161209
+参数：股票代码，时间 如： '600300.SH', 20161209
 ```javascript
-await api.getHistoryMinuteTimeData(MARKET_SH, '600300', 20161209)
+await api.getHistoryMinuteTimeData('600300.SH', 20161209)
 ```
-
-注意，我们可以使用 MARKET_SH , MARKET_SZ 常量来代替 1 和 0 作为参数
 
 #### 8 : 查询分笔成交
 
-参数：市场代码， 股票代码，起始位置， 数量 如： 0,000001,0,10
+参数：股票代码，起始位置， 数量 如： 000001.SZ
 ```javascript
-await api.getTransactionData(MARKET_SZ, '000001', 0, 30)
+await api.getTransactionData('000001.SZ', 0, 30)
 ```
 
 #### 9 : 查询历史分笔成交
 
-参数：市场代码， 股票代码，起始位置，日期 数量 如： 0,000001,0,10,20170209
+参数：股票代码，起始位置，日期 数量 如： '000001.SZ',0,10,20170209
 
 ```javascript
-await api.getHistoryTransactionData(MARKET_SZ, '000001', 0, 10, 20170209)
+await api.getHistoryTransactionData('000001.SZ', 0, 10, 20170209)
 ```
 #### 10 : 查询公司信息目录
-参数：市场代码， 股票代码， 如： 0,000001 或 1,600300
+参数：股票代码， 如： '000001.SZ'
 ```javascript
-await api.getCompanyInfoCategory(MARKET_SZ, '000001')
+await api.getCompanyInfoCategory('000001.SZ')
 ```
 
 #### 11 : 读取公司信息详情
 
-参数：市场代码， 股票代码, 文件名, 起始位置， 数量, 如：0,000001,000001.txt,2054363,9221
+参数：股票代码, 文件名, 起始位置， 数量, 如：'000001.SZ','000001.txt',2054363,9221
 ```javascript
-await api.getCompanyInfoContent(0, '000001', '000001.txt', 0, 10000)
+await api.getCompanyInfoContent('000001.SZ', '000001.txt', 0, 10000)
 ```
 
 注意这里的 起始位置， 数量 参考上面接口的返回结果。
 
 #### 12 : 读取除权除息信息
-参数：市场代码， 股票代码， 如： 0,000001 或 1,600300
+参数：股票代码， 如： '600300.SH'
 ```javascript
-await api.getExRightInfo(1, '600300')
+await api.getExRightInfo('600300.SH')
 ```
 
 #### 13 : 读取财务信息
-参数：市场代码， 股票代码， 如： 0,000001 或 1,600300
+参数：股票代码， 如： '000001.SZ'
 ```javascript
-await api.getFinanceInfo(0, '000001')
+await api.getFinanceInfo('000001.SZ')
 ```
 
 #### 14 : 读取扩展行情
