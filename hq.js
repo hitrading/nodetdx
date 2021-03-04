@@ -20,6 +20,8 @@ const GetCompanyInfoCategory = require('./parser/getCompanyInfoCategory');
 const GetCompanyInfoContent = require('./parser/getCompanyInfoContent');
 
 const { marketHosts } = require('./config/hosts');
+const { parseSymbol, getExchangeId, getPeriodValue } = require('./helper');
+const exchangeIds = ['SH', 'SZ'];
 class TdxMarketApi extends BaseSocketClient {
 
   doPing() {
@@ -27,7 +29,7 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   doHeartbeat() {
-    return this.getSecurityCount(Math.round(Math.random()));
+    return this.getSecurityCount(exchangeIds[Math.round(Math.random())]);
   }
 
   async setup() {
@@ -37,99 +39,129 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   // api list
-  async getSecurityCount(market) {
+  async getSecurityCount(exchangeId) {
     const cmd = new GetSecurityCountCmd(this.client);
-    cmd.setParams(market);
+    cmd.setParams(getExchangeId(exchangeId));
     return await cmd.callApi();
   }
 
-  async getSecurityList(market, start) {
+  async getSecurityList(exchangeId, start) {
     const cmd = new GetSecurityList(this.client);
-    cmd.setParams(market, start);
+    cmd.setParams(getExchangeId(exchangeId), start);
     return await cmd.callApi();
   }
 
-  async getSecurityQuotes(stocks, code) {
-    if (code) {
-      stocks = [[stocks, code]];
+  /**
+   * @param  {...any} codes 
+   * ...codes: 三种形式
+   * '000001.SZ'
+   * ['000001.SZ', '600519.SZ']
+   * '000001.SZ', '600519.SZ'
+   */
+  async getSecurityQuotes(...codes) {
+    if (codes.length === 1) {
+      const firstArg = codes[0];
+      if (typeof firstArg === 'string') {
+        const { exchangeId, code } = parseSymbol(firstArg);
+        codes = [[ exchangeId, code ]];
+      }
+      else if (Array.isArray(firstArg)) {
+        codes = firstArg.map(arg => {
+          const { exchangeId, code } = parseSymbol(arg);
+          return [ exchangeId, code ];
+        });
+      }
     }
-    else if (stocks.length && (typeof stocks[0] === 'number' || typeof stocks[1] === 'string')) {
-      stocks = [stocks];
+    else {
+      codes = codes.map(arg => {
+        const { exchangeId, code } = parseSymbol(arg);
+        return [ exchangeId, code ];
+      });
     }
+
     const cmd = new GetSecurityQuotesCmd(this.client);
-    cmd.setParams(stocks);
+    cmd.setParams(codes);
     return await cmd.callApi();
   }
 
-  async getFinanceInfo(market, code) {
+  async getFinanceInfo(symbol) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetFinanceInfo(this.client);
-    cmd.setParams(market, code);
+    cmd.setParams(exchangeId, code);
     return await cmd.callApi();
   }
 
-  async getExRightInfo(market, code) {
+  async getExRightInfo(symbol) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetExRightInfo(this.client);
-    cmd.setParams(market, code);
+    cmd.setParams(exchangeId, code);
     return await cmd.callApi();
   }
 
-  async getSecurityBars(category, market, code, start, count) {
+  async getSecurityBars(period, symbol, start, count) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetSecurityBarsCmd(this.client);
-    cmd.setParams(category, market, code, start, count);
+    cmd.setParams(getPeriodValue(period), exchangeId, code, start, count);
     return await cmd.callApi();
   }
 
-  async getIndexBars(category, market, code, start, count) {
+  async getIndexBars(period, symbol, start, count) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetIndexBarsCmd(this.client);
-    cmd.setParams(category, market, code, start, count);
+    cmd.setParams(getPeriodValue(period), exchangeId, code, start, count);
     return await cmd.callApi();
   }
 
-  async getMinuteTimeData(market, code) {
+  async getMinuteTimeData(symbol) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetMinuteTimeData(this.client);
-    cmd.setParams(market, code);
+    cmd.setParams(exchangeId, code);
     return await cmd.callApi();
   }
 
-  async getHistoryMinuteTimeData(market, code, date) {
+  async getHistoryMinuteTimeData(symbol, date) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetHistoryMinuteTimeData(this.client);
-    cmd.setParams(market, code, date);
+    cmd.setParams(exchangeId, code, date);
     return await cmd.callApi();
   }
 
-  async getTransactionData(market, code, start, count) {
+  async getTransactionData(symbol, start, count) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetTransactionData(this.client);
-    cmd.setParams(market, code, start, count);
+    cmd.setParams(exchangeId, code, start, count);
     return await cmd.callApi();
   }
 
-  async getHistoryTransactionData(market, code, start, count, date) {
+  async getHistoryTransactionData(symbol, start, count, date) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetHistoryTransactionData(this.client);
-    cmd.setParams(market, code, start, count, date);
+    cmd.setParams(exchangeId, code, start, count, date);
     return await cmd.callApi();
   }
 
-  async getCompanyInfoCategory(market, code) {
+  async getCompanyInfoCategory(symbol) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetCompanyInfoCategory(this.client);
-    cmd.setParams(market, code);
+    cmd.setParams(exchangeId, code);
     return await cmd.callApi();
   }
 
-  async getCompanyInfoContent(market, code, filename, start, length) {
+  async getCompanyInfoContent(symbol, filename, start, length) {
+    const { code, exchangeId } = parseSymbol(symbol);
     const cmd = new GetCompanyInfoContent(this.client);
-    cmd.setParams(market, code, filename, start, length);
+    cmd.setParams(exchangeId, code, filename, start, length);
     return await cmd.callApi();
   }
 
   /**
    * 按日期查询证券K线
-   * @param {Integer} category 0 5分钟K, 1 15分钟K, 2 30分钟K, 3 1小时K, 4 日K, 5 周K, 6 月K, 7 1分钟K, 8 1分钟K, 9 日K, 10 季K, 11 年K
-   * @param {Integer} marketCode
-   * @param {String} code
+   * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
+   * @param {String} symbol
    * @param {String} startDatetime
    * @param {String} endDatetime
    */
-  async findSecurityBars(category = 9, marketCode, code, startDatetime, endDatetime) {
+  async findSecurityBars(period = 'D', symbol, startDatetime, endDatetime) {
     // 具体详情参见 https://github.com/rainx/pytdx/issues/5
     // 具体详情参见 https://github.com/rainx/pytdx/issues/21
 
@@ -142,7 +174,7 @@ class TdxMarketApi extends BaseSocketClient {
     let bars = [];
     let i = 0;
     while(true) {
-      let list = await this.getSecurityBars(category, marketCode, code, i++ * 800, 800); // i++ * 8 => i * 8; i++;
+      let list = await this.getSecurityBars(period, symbol, i++ * 800, 800); // i++ * 8 => i * 8; i++;
 
       if (!list || !list.length) {
         break;
@@ -171,13 +203,12 @@ class TdxMarketApi extends BaseSocketClient {
 
   /**
    * 按日期查询指数K线
-   * @param {Integer} category 0 5分钟K, 1 15分钟K, 2 30分钟K, 3 1小时K, 4 日K, 5 周K, 6 月K, 7 1分钟K, 8 1分钟K, 9 日K, 10 季K, 11 年K
-   * @param {Integer} marketCode
-   * @param {String} code
+   * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
+   * @param {String} symbol
    * @param {String} startDatetime
    * @param {String} endDatetime
    */
-  async findIndexBars(category = 9, marketCode, code, startDatetime, endDatetime) {
+  async findIndexBars(period = 'D', symbol, startDatetime, endDatetime) {
     // 具体详情参见 https://github.com/rainx/pytdx/issues/5
     // 具体详情参见 https://github.com/rainx/pytdx/issues/21
 
@@ -190,7 +221,7 @@ class TdxMarketApi extends BaseSocketClient {
     let bars = [];
     let i = 0;
     while(true) {
-      let list = await this.getIndexBars(category, marketCode, code, i++ * 800, 800); // i++ * 8 => i * 8; i++;
+      let list = await this.getIndexBars(period, symbol, i++ * 800, 800); // i++ * 8 => i * 8; i++;
 
       if (!list || !list.length) {
         break;

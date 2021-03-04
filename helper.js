@@ -229,6 +229,78 @@ function sleep(ms) {
   });
 }
 
+/**
+ * 从symbol解析标的代码、市场代码、子类别等信息
+ * @param {String} symbol code.${exchange}.${subType}
+ * exchange 可选值:
+ * SH: 上证
+ * SZ: 深证
+ *
+ * subType 可选值: (空值表示非指数)
+ * I: 指数
+ */
+function parseSymbol(symbol) {
+  const arr = /^(\w+)\.(\w+)(?:\.(\w+))?$/.exec(symbol);
+  const data = {};
+
+  if (arr) {
+    data.code = arr[1];
+    data.exchangeCode = arr[2];
+
+    if (arr[3]) {
+      data.subType = arr[3];
+      data.isIndex = arr[3] === 'I';
+    }
+    
+    data.exchangeId = getExchangeId(data.exchangeCode);
+  }
+
+  return data;
+}
+
+// 只有SH和SZ两个合法的exchangeCode
+function getExchangeId(exchangeCode) {
+  let exchangeId;
+  switch(exchangeCode) {
+    case 'SH': {
+      exchangeId = 1;
+      break;
+    }
+    case 'SZ': {
+      exchangeId = 0;
+      break;
+    }
+    default: {
+      throw new Error(`exchangeCode ${exchangeCode} is not valid value.`)
+    }
+  }
+
+  return exchangeId;
+}
+
+const PERIOD_MAP = {
+  '1m': 8,
+  '1m_': 7,
+  '5m': 0,
+  '15m': 1,
+  '30m': 2,
+  'H': 3,
+  'D': 9,
+  'W': 5,
+  'M': 6,
+  'D_': 4,
+  'Q': 10,
+  'Y': 11
+};
+
+/**
+ * 0 5分钟K, 1 15分钟K, 2 30分钟K, 3 1小时K, 4 日K, 5 周K, 6 月K, 7 1分钟K, 8 1分钟K, 9 日K, 10 季K, 11 年K
+ * @param {String} name 周期名
+ */
+function getPeriodValue(name) {
+  return PERIOD_MAP[name];
+}
+
 module.exports = {
   hexToBytes,
   bytesToHex,
@@ -241,5 +313,8 @@ module.exports = {
   getTime,
   formatDatetime,
   padStart,
-  sleep
+  sleep,
+  parseSymbol,
+  getExchangeId,
+  getPeriodValue
 };
