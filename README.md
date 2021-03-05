@@ -222,7 +222,36 @@ await api.getExRightInfo('600300.SH')
 await api.getFinanceInfo('000001.SZ')
 ```
 
-#### 14 : 读取扩展行情
+
+#### 14 : 获取k线(不区分是指数还是股票，会自动根据symbol进行区分)
+* category-> 
+```
+K线种类
+0 5分钟K线 
+1 15分钟K线 
+2 30分钟K线 
+3 1小时K线 
+4 日K线
+5 周K线
+6 月K线
+7 1分钟
+8 1分钟K线 
+9 日K线
+10 季K线
+11 年K线
+```
+* period -> 周期代码：1m、H、D 等;
+* symbol -> 证券代码 + '.' + 市场代码;
+* startDatetime -> 指定开始时间;
+* endDatetime -> 指定结束时间; (可省，若省略则endDatetime为当前时间)
+
+如： 
+
+```javascript
+await api.findBars('D', '000001.SH', '2021-03-02', '2021-03-06')
+```
+
+#### 16 : 读取扩展行情
 待完善, 可参考标准行情用法
 
 ### 一些常用代码

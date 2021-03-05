@@ -45,7 +45,7 @@ const api = new TdxExMarketApi({ heartbeatInterval: 5000, idleTimeout: 10000 });
     // api.getInstrumentBars('1m', "i2105.DCE").then(data => console.info(data.slice(-4)));
     // api.getInstrumentInfo(10000, 98).then(data => console.log(data))
 
-    // api.findInstrumentBars('1m', 'i2105.DCE', '2021-03-04 10:00:00', '2021-03-04 10:05:00').then(bars => console.log(bars.slice(-5))); // 上证指数
+    api.findBars('1m', 'i2105.DCE', '2021-03-04 10:00:00', '2021-03-04 10:05:00').then(bars => console.log(bars.slice(-5))); // 上证指数
 
     let st = Date.now();
 

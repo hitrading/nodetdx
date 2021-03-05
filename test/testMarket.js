@@ -76,8 +76,8 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // api.getSecurityQuotes('600300.SH').then(quote => console.log(quote));
     // api.getSecurityQuotes('000001.SZ').then(quote => console.log(quote));
 
-    api.findIndexBars('D', '000001.SH', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 上证指数
-    api.findSecurityBars('D', '000001.SZ', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 中国平安
+    api.findBars('D', '000001.SH', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 上证指数
+    api.findBars('D', '000001.SZ', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 中国平安
 
     let st = Date.now();
 

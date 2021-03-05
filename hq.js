@@ -248,6 +248,19 @@ class TdxMarketApi extends BaseSocketClient {
     return bars;
   }
 
+  /**
+   * 按日期查询K线
+   * 不再区分是指数还是股票, 由程序解析symbol来自动区分, 对调用者屏蔽差异
+   * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
+   * @param {String} symbol
+   * @param {String} startDatetime
+   * @param {String} endDatetime
+   */
+  findBars(period = 'D', symbol, startDatetime, endDatetime) {
+    const { isIndex } = parseSymbol(symbol);
+    return isIndex ? this.findIndexBars(period, symbol, startDatetime, endDatetime) : this.findSecurityBars(period, symbol, startDatetime, endDatetime);
+  }
+
 }
 
 Object.getOwnPropertyNames(TdxMarketApi.prototype).forEach(name => {

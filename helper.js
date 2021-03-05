@@ -229,6 +229,34 @@ function sleep(ms) {
   });
 }
 
+const INDEX_MARKETCODE_MAP = {
+  '000001': 'SH', // 上证综指
+  '000002': 'SH', // A股指数
+  '000003': 'SH', // B股指数
+  '000008': 'SH', // 综合指数
+  '000009': 'SH', // 上证380
+  '000010': 'SH', // 上证180
+  '000011': 'SH', // 基金指数
+  '000012': 'SH', // 国债指数
+  '000016': 'SH', // 上证50
+  '000017': 'SH', // 新综指
+  '000300': 'SH', // 沪深300
+  '399001': 'SZ', // 深证成指
+  '399002': 'SZ', // 深成指R
+  '399003': 'SZ', // 成份B指
+  '399004': 'SZ', // 深证100R
+  '399005': 'SZ', // 中小板指
+  '399006': 'SZ', // 创业板指
+  '399100': 'SZ', // 新指数
+  '399101': 'SZ', // 中小板综
+  '399106': 'SZ', // 深证综指
+  '399107': 'SZ', // 深证A指
+  '399108': 'SZ', // 深证B指
+  '399333': 'SZ', // 中小板R
+  '399606': 'SZ', // 创业板R
+  '399415': 'SZ', // 大数据100
+};
+
 /**
  * 从symbol解析标的代码、市场代码、子类别等信息
  * @param {String} symbol code.${marketCode}.${subType}
@@ -237,7 +265,7 @@ function sleep(ms) {
  * SZ: 深证
  *
  * subType 可选值: (空值表示非指数)
- * I: 指数
+ * 暂无
  */
 function parseSymbol(symbol) {
   const arr = /^(\w+)\.(\w+)(?:\.(\w+))?$/.exec(symbol);
@@ -249,7 +277,10 @@ function parseSymbol(symbol) {
 
     if (arr[3]) {
       data.subType = arr[3];
-      data.isIndex = arr[3] === 'I';
+    }
+
+    if (INDEX_MARKETCODE_MAP[data.code] === data.marketCode) {
+      data.isIndex = true;
     }
     
     data.marketId = getMarketId(data.marketCode);
@@ -342,7 +373,7 @@ function calcEndTimestamp(endDatetime) {
     endDatetime += ' 15:00';
   }
 
-  return endDatetime ? new Date(endDatetime).getTime() : Date.now();
+  return endDatetime ? new Date(endDatetime).getTime() : (Date.now() + 3600000); // 1000 * 60 * 60, 多加个一小时的时间戳, 保证始终能查到最新的数据
 }
 
 module.exports = {

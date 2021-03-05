@@ -111,14 +111,14 @@ class TdxExMarketApi extends BaseSocketClient {
   }
 
   /**
-   * 按日期查询指数K线
+   * 按日期查询K线
    * TODO 期货行情的时间需要做特殊处理
    * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
    * @param {String} symbol
    * @param {String} startDatetime
    * @param {String} endDatetime
    */
-  async findInstrumentBars(period = 'D', symbol, startDatetime, endDatetime) {
+  async findBars(period = 'D', symbol, startDatetime, endDatetime) {
     // 具体详情参见 https://github.com/rainx/pytdx/issues/5
     // 具体详情参见 https://github.com/rainx/pytdx/issues/21
 
