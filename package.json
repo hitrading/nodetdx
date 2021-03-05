@@ -3,7 +3,7 @@
   "version": "3.3.1",
   "description": "a tdx interface implemention by pure nodejs",
   "main": "index.js",
-  "author": "",
+  "author": "weilee",
   "license": "MIT",
   "dependencies": {
     "bufferpack": "0.0.6",
