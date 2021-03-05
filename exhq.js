@@ -14,7 +14,7 @@ const ExGetHistoryTransactionData = require('./parser/exGetHistoryTransactionDat
 const ExGetHistoryInstrumentBarsRange = require('./parser/exGetHistoryInstrumentBarsRange');
 
 const { exMarketHosts } = require('./config/hosts');
-const { parseSymbol, getExchangeId, getPeriodValue, getCategoryId, calcStartTimestamp, calcEndTimestamp } = require('./helper');
+const { parseSymbol, getMarketId, getPeriodValue, getCategoryId, calcStartTimestamp, calcEndTimestamp } = require('./helper');
 class TdxExMarketApi extends BaseSocketClient {
 
   doPing() {
@@ -42,55 +42,55 @@ class TdxExMarketApi extends BaseSocketClient {
   }
 
   async getInstrumentQuote(symbol) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new ExGetInstrumentQuote(this.client);
-    cmd.setParams(exchangeId, code);
+    cmd.setParams(marketId, code);
     return await cmd.callApi();
   }
 
   async getInstrumentBars(period, symbol, start = 0, count = 700) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new ExGetInstrumentBars(this.client);
-    cmd.setParams(getPeriodValue(period), exchangeId, code, start, count);
+    cmd.setParams(getPeriodValue(period), marketId, code, start, count);
     return await cmd.callApi();
   }
 
   async getMinuteTimeData(symbol) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new ExGetMinuteTimeData(this.client);
-    cmd.setParams(exchangeId, code)
+    cmd.setParams(marketId, code)
     return await cmd.callApi();
   }
 
 
   async getHistoryMinuteTimeData(symbol, date) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new ExGetHistoryMinuteTimeData(this.client);
-    cmd.setParams(exchangeId, code, date);
+    cmd.setParams(marketId, code, date);
     return await cmd.callApi();
   }
 
 
   async getTransactionData(symbol, start = 0, count = 1800) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new ExGetTransactionData(this.client);
-    cmd.setParams(exchangeId, code, start, count);
+    cmd.setParams(marketId, code, start, count);
     return await cmd.callApi();
   }
 
 
   async getHistoryTransactionData(symbol, date, start = 0, count = 1800) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new ExGetHistoryTransactionData(this.client);
-    cmd.setParams(exchangeId, code, date, start, count);
+    cmd.setParams(marketId, code, date, start, count);
     return await cmd.callApi();
   }
 
 
   async getHistoryInstrumentBarsRange(symbol, start, end) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new ExGetHistoryInstrumentBarsRange(this.client);
-    cmd.setParams(exchangeId, code, start, end);
+    cmd.setParams(marketId, code, start, end);
     return await cmd.callApi();
   }
 
@@ -103,10 +103,10 @@ class TdxExMarketApi extends BaseSocketClient {
 
 
   async getInstrumentQuoteList(exchangeCode, start = 0, count = 80) {
-    const exchangeId = getExchangeId(exchangeCode);
+    const marketId = getMarketId(exchangeCode);
     const categoryId = getCategoryId(exchangeCode);
     const cmd = new ExGetInstrumentQuoteList(this.client);
-    cmd.setParams(exchangeId, categoryId, start, count);
+    cmd.setParams(marketId, categoryId, start, count);
     return await cmd.callApi();
   }
 

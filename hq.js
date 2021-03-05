@@ -20,8 +20,8 @@ const GetCompanyInfoCategory = require('./parser/getCompanyInfoCategory');
 const GetCompanyInfoContent = require('./parser/getCompanyInfoContent');
 
 const { marketHosts } = require('./config/hosts');
-const { parseSymbol, getExchangeId, getPeriodValue, calcStartTimestamp, calcEndTimestamp } = require('./helper');
-const exchangeIds = ['SH', 'SZ'];
+const { parseSymbol, getMarketId, getPeriodValue, calcStartTimestamp, calcEndTimestamp } = require('./helper');
+const marketIds = ['SH', 'SZ'];
 class TdxMarketApi extends BaseSocketClient {
 
   doPing() {
@@ -29,7 +29,7 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   doHeartbeat() {
-    return this.getSecurityCount(exchangeIds[Math.round(Math.random())]);
+    return this.getSecurityCount(marketIds[Math.round(Math.random())]);
   }
 
   async setup() {
@@ -39,15 +39,15 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   // api list
-  async getSecurityCount(exchangeId) {
+  async getSecurityCount(marketId) {
     const cmd = new GetSecurityCountCmd(this.client);
-    cmd.setParams(getExchangeId(exchangeId));
+    cmd.setParams(getMarketId(marketId));
     return await cmd.callApi();
   }
 
-  async getSecurityList(exchangeId, start) {
+  async getSecurityList(marketId, start) {
     const cmd = new GetSecurityList(this.client);
-    cmd.setParams(getExchangeId(exchangeId), start);
+    cmd.setParams(getMarketId(marketId), start);
     return await cmd.callApi();
   }
 
@@ -62,20 +62,20 @@ class TdxMarketApi extends BaseSocketClient {
     if (codes.length === 1) {
       const firstArg = codes[0];
       if (typeof firstArg === 'string') {
-        const { exchangeId, code } = parseSymbol(firstArg);
-        codes = [[ exchangeId, code ]];
+        const { marketId, code } = parseSymbol(firstArg);
+        codes = [[ marketId, code ]];
       }
       else if (Array.isArray(firstArg)) {
         codes = firstArg.map(arg => {
-          const { exchangeId, code } = parseSymbol(arg);
-          return [ exchangeId, code ];
+          const { marketId, code } = parseSymbol(arg);
+          return [ marketId, code ];
         });
       }
     }
     else {
       codes = codes.map(arg => {
-        const { exchangeId, code } = parseSymbol(arg);
-        return [ exchangeId, code ];
+        const { marketId, code } = parseSymbol(arg);
+        return [ marketId, code ];
       });
     }
 
@@ -85,72 +85,72 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   async getFinanceInfo(symbol) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetFinanceInfo(this.client);
-    cmd.setParams(exchangeId, code);
+    cmd.setParams(marketId, code);
     return await cmd.callApi();
   }
 
   async getExRightInfo(symbol) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetExRightInfo(this.client);
-    cmd.setParams(exchangeId, code);
+    cmd.setParams(marketId, code);
     return await cmd.callApi();
   }
 
   async getSecurityBars(period, symbol, start, count) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetSecurityBarsCmd(this.client);
-    cmd.setParams(getPeriodValue(period), exchangeId, code, start, count);
+    cmd.setParams(getPeriodValue(period), marketId, code, start, count);
     return await cmd.callApi();
   }
 
   async getIndexBars(period, symbol, start, count) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetIndexBarsCmd(this.client);
-    cmd.setParams(getPeriodValue(period), exchangeId, code, start, count);
+    cmd.setParams(getPeriodValue(period), marketId, code, start, count);
     return await cmd.callApi();
   }
 
   async getMinuteTimeData(symbol) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetMinuteTimeData(this.client);
-    cmd.setParams(exchangeId, code);
+    cmd.setParams(marketId, code);
     return await cmd.callApi();
   }
 
   async getHistoryMinuteTimeData(symbol, date) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetHistoryMinuteTimeData(this.client);
-    cmd.setParams(exchangeId, code, date);
+    cmd.setParams(marketId, code, date);
     return await cmd.callApi();
   }
 
   async getTransactionData(symbol, start, count) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetTransactionData(this.client);
-    cmd.setParams(exchangeId, code, start, count);
+    cmd.setParams(marketId, code, start, count);
     return await cmd.callApi();
   }
 
   async getHistoryTransactionData(symbol, start, count, date) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetHistoryTransactionData(this.client);
-    cmd.setParams(exchangeId, code, start, count, date);
+    cmd.setParams(marketId, code, start, count, date);
     return await cmd.callApi();
   }
 
   async getCompanyInfoCategory(symbol) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetCompanyInfoCategory(this.client);
-    cmd.setParams(exchangeId, code);
+    cmd.setParams(marketId, code);
     return await cmd.callApi();
   }
 
   async getCompanyInfoContent(symbol, filename, start, length) {
-    const { code, exchangeId } = parseSymbol(symbol);
+    const { code, marketId } = parseSymbol(symbol);
     const cmd = new GetCompanyInfoContent(this.client);
-    cmd.setParams(exchangeId, code, filename, start, length);
+    cmd.setParams(marketId, code, filename, start, length);
     return await cmd.callApi();
   }
 

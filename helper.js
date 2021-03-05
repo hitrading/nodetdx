@@ -231,8 +231,8 @@ function sleep(ms) {
 
 /**
  * 从symbol解析标的代码、市场代码、子类别等信息
- * @param {String} symbol code.${exchange}.${subType}
- * exchange 可选值:
+ * @param {String} symbol code.${marketCode}.${subType}
+ * marketCode 可选值:
  * SH: 上证
  * SZ: 深证
  *
@@ -245,20 +245,20 @@ function parseSymbol(symbol) {
 
   if (arr) {
     data.code = arr[1].toUpperCase(); // 通达信扩展行情的期货合约品种字母必须全部为大写, 比如rb2105必须转换为RB2105
-    data.exchangeCode = arr[2];
+    data.marketCode = arr[2];
 
     if (arr[3]) {
       data.subType = arr[3];
       data.isIndex = arr[3] === 'I';
     }
     
-    data.exchangeId = getExchangeId(data.exchangeCode);
+    data.marketId = getMarketId(data.marketCode);
   }
 
   return data;
 }
 
-const EXCHANGEID_MAP = {
+const MARKETID_MAP = {
   SH: 1,
   SZ: 0,
   DCE: 29,
@@ -274,9 +274,18 @@ const EXCHANGEID_MAP = {
   MFC: 60, // 主力期货合约, main future contract
 };
 
-// 只有SH和SZ两个合法的exchangeCode
-function getExchangeId(exchangeCode) {
-  return EXCHANGEID_MAP[exchangeCode];
+const MARKETCODE_MAP = {};
+
+for (let marketCode in MARKETID_MAP) {
+  MARKETCODE_MAP[MARKETID_MAP[marketCode]] = marketCode;
+}
+
+function getMarketId(marketCode) {
+  return MARKETID_MAP[marketCode];
+}
+
+function getMarketCode(marketId) {
+  return MARKETCODE_MAP[marketId];
 }
 
 const CATEGORYID_MAP = {
@@ -293,8 +302,8 @@ const CATEGORYID_MAP = {
   MFC: 3, // 主力期货合约, main future contract
 };
 
-function getCategoryId(exchangeCode) {
-  return CATEGORYID_MAP[exchangeCode];
+function getCategoryId(marketCode) {
+  return CATEGORYID_MAP[marketCode];
 }
 
 const PERIOD_MAP = {
@@ -349,10 +358,11 @@ module.exports = {
   formatDatetime,
   padStart,
   sleep,
+  calcStartTimestamp,
+  calcEndTimestamp,
   parseSymbol,
-  getExchangeId,
+  getMarketId,
   getPeriodValue,
   getCategoryId,
-  calcStartTimestamp,
-  calcEndTimestamp
+  getMarketCode
 };

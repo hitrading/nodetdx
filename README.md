@@ -225,8 +225,42 @@ await api.getFinanceInfo('000001.SZ')
 #### 14 : 读取扩展行情
 待完善, 可参考标准行情用法
 
-## 其它
+### 一些常用代码
+市场代码（仅列出已被程序定义和实现的部分代码）：
+---
+```
+SH: 上证
+SZ: 深证
+DCE: 大商
+CZCE: 郑商
+SHFE: 上期
+CFFEX: 中金
+O@CZCE: 郑州商品期权
+O@DCE: 大连商品期权
+O@SHFE: 上海商品期权
+O@CFFEX: 中金所期权
+O@SH: 上海股票期权
+O@SZ: 深圳股票期权
+MFC: 主力期货合约
+```
 
+
+查询k线支持的时间周期：
+---
+```
+1m: 1分钟
+5m: 5分钟
+15m: 15分钟
+30m: 30分钟
+H: 时
+D: 日
+W: 周
+M: 月
+Q: 季
+Y: 年
+```
+
+## 其它
 本项目fork自[https://github.com/rainx/pytdx](https://github.com/rainx/pytdx)，在pytdx基础上修改而来，并修复了一些bug
 
 在此感谢pytdx的作者[RainX](https://github.com/rainx)
