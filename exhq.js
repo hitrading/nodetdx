@@ -151,7 +151,7 @@ class TdxExMarketApi extends BaseSocketClient {
           const timestamp = new Date(bar.datetime).getTime();
           return timestamp >= startTimestamp && timestamp <= endTimestamp;
         });
-        bars = bars.concat(list);
+        bars = list.concat(bars);
       }
     }
 
