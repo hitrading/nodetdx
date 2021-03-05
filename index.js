@@ -2,7 +2,6 @@ const {
   parseSymbol,
   getMarketId,
   getPeriodValue,
-  getCategoryId,
   getMarketCode
 } = require('./helper');
 
