@@ -81,6 +81,18 @@ if (await api.connect('119.147.212.81', 7709)) {
     api.disconnect()
 }
 ```
+或者
+```javascript
+// 不传参数时将自动从hosts列表里挑选ping延迟最低的服务器
+// 需要注意的是ping延迟最低的服务器更新quote的时间未必是最及时的、最快的
+// 也就是说某些ping延迟低的服务器返回的quote可能比一些ping延迟高一点的服务器返回的quote更新的速度还慢
+// 这取决于服务器更新quote的速度
+// 所以当遇到这样的情况时最好手动指定host和port, 当然这个host和port必然是要经过自己的测试证明quote的更新速度的确是没有问题的
+if (await api.connect()) {
+    // ... same codes...
+    api.disconnect()
+}
+```
 
 可以使用的api方法有下列的几个。
 
