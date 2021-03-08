@@ -143,7 +143,11 @@ class TdxExMarketApi extends BaseSocketClient {
         const firstTimestamp = new Date(firstBar.datetime).getTime();
         const lastTimestamp = new Date(lastBar.datetime).getTime();
 
-        if (startTimestamp > lastTimestamp || firstTimestamp > endTimestamp) {
+        if (firstTimestamp >= endTimestamp) {
+          continue;
+        }
+
+        if (startTimestamp > lastTimestamp) {
           break;
         }
 
