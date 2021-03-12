@@ -6,8 +6,8 @@ const api = new TdxExMarketApi({ heartbeatInterval: 5000, idleTimeout: 10000 });
 (async() => {
   if (await api.connect('106.14.95.149', 7727)) { // 112.74.214.43: 7727
 
-    console.info("获取市场代码")
-    console.info(await api.getMarkets())
+    // console.info("获取市场代码")
+    // console.info(await api.getMarkets())
     // console.info("查询市场中商品数量")
     // console.info(await api.getInstrumentCount())
     // console.info("查询五档行情")
@@ -45,8 +45,10 @@ const api = new TdxExMarketApi({ heartbeatInterval: 5000, idleTimeout: 10000 });
     // api.getInstrumentBars('1m', "i2105.DCE").then(data => console.info(data.slice(-4)));
     // api.getInstrumentInfo(10000, 98).then(data => console.log(data))
 
-    api.findBars('1m', 'i2105.DCE', '2021-03-04 10:00:00', '2021-03-04 10:05:00').then(bars => console.log(bars.slice(-5))); // 上证指数
-
+    // api.findBars('1m', 'i2105.DCE', '2021-03-04 10:00:00', '2021-03-04 10:05:00').then(bars => console.log(bars.slice(-5))); // 上证指数
+    api.subscribe('getInstrumentBars', '1m', "i2105.DCE", (data) => {
+      console.log(data)
+    });
     let st = Date.now();
 
     process.on('unhandledRejection', (e) => {

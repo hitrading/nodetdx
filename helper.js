@@ -376,6 +376,34 @@ function calcEndTimestamp(endDatetime) {
   return endDatetime ? new Date(endDatetime).getTime() : (Date.now() + 3600000); // 1000 * 60 * 60, 多加个一小时的时间戳, 保证始终能查到最新的数据
 }
 
+function isChanged(lastData, currentData) {
+  if (typeof lastData === 'object' && lastData !== null && typeof currentData === 'object' && currentData !== null) {
+    if (Array.isArray(lastData) && Array.isArray(currentData)) {
+      if (lastData.length !== currentData.length) {
+        return true;
+      }
+      for (let i = 0; i < lastData.length; i++) {
+        if (isChanged(lastData[i], currentData[i])) {
+          return true;
+        }
+      }
+    }
+    else { // 普通对象
+      for (let key in lastData) {
+        // if (key  === 'handle') {
+        //   continue;
+        // }
+        if (isChanged(lastData[key], currentData[key])) {
+          return true;
+        }
+      }
+    }
+  }
+  else {
+    return lastData !== currentData;
+  }
+}
+
 module.exports = {
   hexToBytes,
   bytesToHex,
@@ -395,5 +423,6 @@ module.exports = {
   getMarketId,
   getPeriodValue,
   getCategoryId,
-  getMarketCode
+  getMarketCode,
+  isChanged
 };

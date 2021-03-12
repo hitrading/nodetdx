@@ -1,4 +1,5 @@
-// const logger = require('./log');
+const childProcess = require('child_process');
+const path = require('path');
 const BaseSocketClient = require('./baseSocketClient');
 const {
   SetupCmd1,
@@ -267,6 +268,29 @@ class TdxMarketApi extends BaseSocketClient {
   findBars(period = 'D', symbol, startDatetime, endDatetime) {
     const { isIndex } = parseSymbol(symbol);
     return isIndex ? this.findIndexBars(period, symbol, startDatetime, endDatetime) : this.findSecurityBars(period, symbol, startDatetime, endDatetime);
+  }
+
+  /**
+   * 订阅函数会创建子进程使用独立的socket不断的调用methodName指定的方法
+   * @param {Array} args
+   * args = [methodName, ...actualArgs, callback]
+   */
+  subscribe(...args) {
+    const methodName = args.shift();
+    const callback = args.pop();
+
+    if (!this[methodName] || typeof this[methodName] !== 'function') {
+      throw new Error('first argument of subscribe must be an existing function name.');
+    }
+
+    if (typeof callback !== 'function') {
+      throw new Error('last argument of subscribe must be a function.');
+    }
+
+    const child = childProcess.fork(path.join(__dirname, './hqChildProcess.js'), [ methodName, args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+    child.on('message', data => {
+      callback(data);
+    });
   }
 
 }
