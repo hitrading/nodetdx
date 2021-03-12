@@ -181,9 +181,12 @@ class TdxExMarketApi extends BaseSocketClient {
     }
 
     const child = childProcess.fork(path.join(__dirname, './exhqChildProcess.js'), [ methodName, args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+    
     child.on('message', data => {
       callback(data);
     });
+
+    return child;
   }
 
 }
