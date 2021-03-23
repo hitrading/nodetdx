@@ -70,5 +70,4 @@ class TdxMinBarReader extends BaseReader {
   }
 }
 
-
-
+module.exports = TdxMinBarReader;
