@@ -271,7 +271,19 @@ api.subscribe('getSecurityQuotes', '600519.SH', callback);
 #### 16 : 读取扩展行情
 待完善, 可参考标准行情用法
 
-#### 17 : 一些常用代码
+#### 17 : 解析盘后下载的1分钟K线数据文件(*.lc1)
+可参考test/testReader.js
+```javascript
+const path = require('path');
+const { TdxMinuteBarReader } = require('nodetdx');
+
+const reader = new TdxMinuteBarReader();
+
+const result = reader.parseDataFromFile(path.join(__dirname, './sz000001.lc1'));
+console.log(JSON.stringify(result));
+```
+
+#### 18 : 一些常用代码
 市场代码（仅列出已被程序定义和实现的部分代码）：
 
 ```
