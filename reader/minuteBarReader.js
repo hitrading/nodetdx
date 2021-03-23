@@ -24,7 +24,7 @@ const { formatDatetime } = require('../helper');
 
 
 
-class TdxMinBarReader extends BaseReader {
+class TdxMinuteBarReader extends BaseReader {
   // 读取通达信分钟数据
   parseDataFromFile(filename) {
     if (!fs.existsSync(filename)) {
@@ -32,25 +32,25 @@ class TdxMinBarReader extends BaseReader {
     }
 
     const content = fs.readFileSync(filename);
-    const rawList = this.unpackRecords('<HHIIIIfII', content);
+    const rawList = this.unpackRecords('<HHfffffII', content);
     const result = [];
     for (const row of rawList) {
       const [ year, month, day ] = this.parseDate(row[0]);
       const [ hour, minute ] = this.parseTime(row[1]);
 
-      result.append({
-        datetime: formatDatetime(year, month, day, hour, minute),
+      result.push({
+        datetime: formatDatetime(year, month, day, hour, minute, 'yyyy-MM-dd hh:mm:ss'),
         year,
         month,
         day,
         hour,
         minute,
-        open: row[2] / 100,
-        high: row[3] / 100,
-        low: row[4] / 100,
-        close: row[5] / 100,
-        amount: row[6],
-        volume: row[7],
+        open: Number(row[2].toFixed(2)),
+        high: Number(row[3].toFixed(2)),
+        low: Number(row[4].toFixed(2)),
+        close: Number(row[5].toFixed(2)),
+        amount: Number(row[6].toFixed(2)),
+        volume: row[7] / 100, // 多少手
         // unknown: row[8]
       });
     }
@@ -58,8 +58,8 @@ class TdxMinBarReader extends BaseReader {
   }
 
   parseDate(num) {
-    const year = num;  // 2048 + 2004
-    const month = num % 2048; // 100
+    const year = Math.floor(num / 2048) + 2004;
+    const month = Math.floor((num % 2048) / 100);
     const day = (num % 2048) % 100;
 
     return [ year, month, day ];
@@ -70,4 +70,4 @@ class TdxMinBarReader extends BaseReader {
   }
 }
 
-module.exports = TdxMinBarReader;
+module.exports = TdxMinuteBarReader;
