@@ -260,6 +260,7 @@ class TdxMarketApi extends BaseSocketClient {
   /**
    * 按日期查询K线
    * 不再区分是指数还是股票, 由程序解析symbol来自动区分, 对调用者屏蔽差异
+   * 注: 这里有个问题 因为tdx的官网的最大显示就是24000条 所以1min和5min数据 最多只能取24000条左右 这个没法再多了 其他的没啥影响
    * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
    * @param {String} symbol
    * @param {String} startDatetime

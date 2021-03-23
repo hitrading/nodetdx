@@ -53,7 +53,7 @@ function getVolume(ivol) {
 
   let dblXmm6 = Math.pow(2.0, tmpEax);
   if (dwEcx < 0)
-      dblXmm6 = 1.0 / dblXmm6;
+    dblXmm6 = 1.0 / dblXmm6;
 
   let dblXmm0, dblXmm4 = 0;
   if (hleax > 0x80) {
