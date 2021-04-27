@@ -279,7 +279,7 @@ function parseSymbol(symbol) {
       data.subType = arr[3];
     }
 
-    if (INDEX_MARKETCODE_MAP[data.code] === data.marketCode) {
+    if (INDEX_MARKETCODE_MAP[data.code] === data.marketCode || /^880\d{3}$/.test(data.code)) { // 板块指数以880开头
       data.isIndex = true;
     }
     
