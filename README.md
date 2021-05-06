@@ -268,10 +268,37 @@ await api.findBars('D', '000001.SH', '2021-03-02', '2021-03-06')
 api.subscribe('getSecurityQuotes', '600519.SH', callback);
 ```
 
-#### 16 : 读取扩展行情
+#### 16 : 订阅行情（数据变化推送, 无变化不推送）
+* 最后一个参数：回调函数, 用于接收订阅的数据
+* 剩余的参数：需要订阅的股票symbol
+* 若要订阅全市场的股票行情则只需传一个回调函数作为参数
+
+**注：该函数会开子进程轮询, 为防止子进程耗尽资源应谨慎使用, 通常用于订阅行情和K线比较合适**
+
+```javascript
+// 订阅'600519.SH', '000001.SH'的行情
+api.subscribeQuotes('600519.SH', '000001.SH', callback);
+// 订阅全市场股票的行情
+api.subscribeQuotes(callback);
+```
+
+#### 17 : 查询指定市场所有股票信息列表
+* 参数：市场代码
+* 若参数为空则查询沪深两市所有股票信息列表
+
+```javascript
+// 查询沪市所有股票信息列表
+await api.findStockList('SH');
+// 查询深市所有股票信息列表
+await api.findStockList('SZ');
+// 查询沪市、深市所有股票信息列表
+await api.findStockList();
+```
+
+#### 18 : 读取扩展行情
 待完善, 可参考标准行情用法
 
-#### 17 : 解析盘后下载的1分钟K线数据文件(*.lc1)
+#### 19 : 解析盘后下载的1分钟K线数据文件(*.lc1)
 可参考test/testReader.js
 ```javascript
 const path = require('path');

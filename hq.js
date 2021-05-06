@@ -53,35 +53,37 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   /**
-   * @param  {...any} codes 
-   * ...codes: 三种形式
+   * symbols的长度最大为80, 若超过80只股票则只查询前80只股票的quote
+   * @param  {...any} symbols 
+   * ...symbols: 三种形式
    * '000001.SZ'
    * ['000001.SZ', '600519.SZ']
    * '000001.SZ', '600519.SZ'
    */
-  async getSecurityQuotes(...codes) {
-    if (codes.length === 1) {
-      const firstArg = codes[0];
+  async getSecurityQuotes(...symbols) {
+    let params;
+    if (symbols.length === 1) {
+      const firstArg = symbols[0];
       if (typeof firstArg === 'string') {
         const { marketId, code } = parseSymbol(firstArg);
-        codes = [[ marketId, code ]];
+        params = [[ marketId, code ]];
       }
       else if (Array.isArray(firstArg)) {
-        codes = firstArg.map(arg => {
+        params = firstArg.map(arg => {
           const { marketId, code } = parseSymbol(arg);
           return [ marketId, code ];
         });
       }
     }
     else {
-      codes = codes.map(arg => {
+      params = symbols.map(arg => {
         const { marketId, code } = parseSymbol(arg);
         return [ marketId, code ];
       });
     }
 
     const cmd = new GetSecurityQuotesCmd(this.client);
-    cmd.setParams(codes);
+    cmd.setParams(params);
     return await cmd.callApi();
   }
 
@@ -272,7 +274,7 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   /**
-   * 订阅函数会创建子进程使用独立的socket不断的调用methodName指定的方法
+   * 订阅函数会创建子进程不断的调用methodName指定的方法
    * @param {Array} args
    * args = [methodName, ...actualArgs, callback]
    */
@@ -287,7 +289,7 @@ class TdxMarketApi extends BaseSocketClient {
     if (typeof callback !== 'function') {
       throw new Error('last argument of subscribe must be a function.');
     }
-
+    
     const child = childProcess.fork(path.join(__dirname, './hqChildProcess.js'), [ methodName, args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
     
     child.on('message', data => {
@@ -295,6 +297,56 @@ class TdxMarketApi extends BaseSocketClient {
     });
     
     return child;
+  }
+
+  /**
+   * 订阅quotes函数会创建子进程不断的调用getSecurityQuotes
+   * @param {Array} args
+   * args = [...actualArgs, callback]
+   */
+  subscribeQuotes(...args) {
+    const callback = args.pop();
+
+    if (typeof callback !== 'function') {
+      throw new Error('last argument of subscribe must be a function.');
+    }
+    
+    const child = childProcess.fork(path.join(__dirname, './subscribeQuotesChildProcess.js'), [ args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+    
+    child.on('message', data => {
+      callback(data);
+    });
+    
+    return child;
+  }
+
+  async findStockList(marketId) {
+    if (marketId) {
+      const list = [], step = 1000;
+      const regMap = {
+        SH: /^6\d{5}$/,
+        SZ: /^[03]\d{5}$/
+      };
+      const reg = regMap[marketId];
+
+      let i = 0, tmpList;
+      
+      do {
+        tmpList = await this.getSecurityList(marketId, i++ * step);
+        tmpList.forEach(item => {
+          if (reg.test(item.code)) {
+            item.symbol = item.code + '.' + marketId;
+            list.push(item);
+          }
+        });
+      }
+      while(tmpList.length);
+
+      return list;
+    }
+    else {
+      return [ ...await this.findStockList('SH'), ...await this.findStockList('SZ') ];
+    }
   }
 
 }
