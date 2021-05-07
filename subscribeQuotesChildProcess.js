@@ -2,7 +2,7 @@ const TdxMarketApi = require('./hq');
 const { isChanged } = require('./helper');
 
 let [ , , args, host, port ] = process.argv;
-let lastData;
+const lastDataMap = {};
 
 args = args.split(',');
 
@@ -28,14 +28,14 @@ const step = 80;
   else {
     loopRequest(api, args);
   }
-  
 })();
 
 async function loopRequest(api, args) {
+  const key = args.join(',');
   const data = await api.getSecurityQuotes(...args);
-  if (data && isChanged(lastData, data)) {
-    lastData = data;
+  if (data && isChanged(lastDataMap[key], data)) {
+    lastDataMap[key] = data;
     process.send(data);
   }
-  loopRequest(api, methodName, args);
+  loopRequest(api, args);
 }
