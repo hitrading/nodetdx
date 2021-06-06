@@ -15,7 +15,7 @@ const ExGetHistoryTransactionData = require('./parser/exGetHistoryTransactionDat
 const ExGetHistoryInstrumentBarsRange = require('./parser/exGetHistoryInstrumentBarsRange');
 
 const { exMarketHosts } = require('./config/hosts');
-const { parseSymbol, getMarketId, getPeriodValue, getCategoryId, calcStartTimestamp, calcEndTimestamp } = require('./helper');
+const { parseSymbol, getMarketId, getPeriodValue, getCategoryId, calcStartTimestamp, calcEndTimestamp, fixDatetime } = require('./helper');
 class TdxExMarketApi extends BaseSocketClient {
 
   doPing() {
@@ -53,7 +53,15 @@ class TdxExMarketApi extends BaseSocketClient {
     const { code, marketId } = parseSymbol(symbol);
     const cmd = new ExGetInstrumentBars(this.client);
     cmd.setParams(getPeriodValue(period), marketId, code, start, count);
-    return await cmd.callApi();
+    const bars = await cmd.callApi();
+
+    bars.forEach(bar => {
+      // 通达信期货行情里K线的日期都是结算日，需要修正为交易实际发生的日期
+      // 通达信一天行情开始的时间为01分，修改为从00分开始
+      fixDatetime(bar);
+    });
+
+    return bars;
   }
 
   async getMinuteTimeData(symbol) {

@@ -1,7 +1,7 @@
 const { TdxExMarketApi, setLogLevel } = require('../index');
 
 setLogLevel('INFO');
-const api = new TdxExMarketApi({ heartbeatInterval: 5000, idleTimeout: 10000 });
+const api = new TdxExMarketApi({ heartbeatInterval: 5000, idleTimeout: 10000, useHeartbeat: false, reconnectInterval: -1 });
 
 (async() => {
   if (await api.connect('106.14.95.149', 7727)) { // 112.74.214.43: 7727
@@ -41,14 +41,21 @@ const api = new TdxExMarketApi({ heartbeatInterval: 5000, idleTimeout: 10000 });
     // console.info("按结算日日期区间查询K线")
     // console.info((await api.getHistoryInstrumentBarsRange("i2105.DCE", 20210304, 20210304)).reverse())
 
-    // api.getInstrumentBars('1m', "IFL0.CFFEX").then(data => console.info(JSON.stringify(data.slice(-10))));
-    // api.getInstrumentBars('1m', "i2105.DCE").then(data => console.info(data.slice(-4)));
+    // api.getInstrumentBars('1m', "IFL8.CFFEX").then(data => console.info(JSON.stringify(data.slice(-10))));
+    // const data = await api.getInstrumentBars('1m', "ag2106.SHFE", 0 ,800);
+    // data.forEach(bar => console.log(bar))
+    
+    // bars.sort((a, b) => {
+    //   return new Date(a.datetime) > new Date(b.datetime) ? 1 : -1
+    // });
     // api.getInstrumentInfo(10000, 98).then(data => console.log(data))
 
-    // api.findBars('1m', 'i2105.DCE', '2021-03-04 10:00:00', '2021-03-04 10:05:00').then(bars => console.log(bars.slice(-5))); // 上证指数
-    api.subscribe('getInstrumentBars', '1m', "i2105.DCE", (data) => {
-      console.log(data)
-    });
+    const bars = await api.findBars('1m', 'ag2106.SHFE', '2020-12-20 23:57:00', '2020-12-29 09:01:00'); // 上证指数
+    bars.forEach(bar => console.log(bar))
+    api.close();
+    // api.subscribe('getInstrumentBars', '1m', "i2105.DCE", (data) => {
+    //   console.log(data)
+    // });
     let st = Date.now();
 
     process.on('unhandledRejection', (e) => {

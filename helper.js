@@ -404,6 +404,35 @@ function isChanged(lastData, currentData) {
   }
 }
 
+// 修复交易日期（由于从通达信拉取到的行情bar的日期实际上是结算日期，所以需要转换为实际每一笔交易发生的日期）
+function fixDatetime(bar) {
+  let dt = new Date(bar.datetime);
+  let date = dt.getDate();
+  dt.setMinutes(dt.getMinutes() - 1); // 00:00:00 减少一分钟后 日期也会相应减少一日, 所以需要重置日期为结算日
+  dt.setDate(date);
+  let hours = dt.getHours();
+  let minutes = dt.getMinutes();
+  let seconds = dt.getSeconds();
+  hours < 10 && (hours = '0' + hours);
+  minutes < 10 && (minutes = '0' + minutes);
+  seconds < 10 && (seconds = '0' + seconds);
+  const tradeTime = hours + ':' + minutes + ':' + seconds;
+  let day = dt.getDay();
+  let isMonday = day === 1;
+
+  if (tradeTime > '20:55:00' && tradeTime <= '23:59:59') { // 当天夜盘21点到凌晨0点之间
+    dt.setDate(dt.getDate() - (isMonday ? 3 : 1));
+  }
+  else if (tradeTime >= '00:00:00' && tradeTime <= '08:00:00') { // 或者 凌晨0点到上午8点之间, 目前到02:30就可以了
+    dt.setDate(dt.getDate() - (isMonday ? 2 : 0));
+  }
+
+  let month = dt.getMonth() + 1;
+  date = dt.getDate();
+  const tradeDate = dt.getFullYear() + '-' + (month < 10 ? '0' + month : month) + '-' + (date < 10 ? '0' + date : date);
+  bar.datetime = tradeDate + ' ' + tradeTime;
+}
+
 module.exports = {
   hexToBytes,
   bytesToHex,
@@ -424,5 +453,6 @@ module.exports = {
   getPeriodValue,
   getCategoryId,
   getMarketCode,
-  isChanged
+  isChanged,
+  fixDatetime,
 };
