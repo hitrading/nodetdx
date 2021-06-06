@@ -4,6 +4,7 @@ const {
   // bufferToBytes,
   // bytesToBuffer,
   formatDatetime,
+  parsePrice
 } = require('../helper');
 
 class ExGetTransactionData extends BaseParser {
@@ -124,7 +125,7 @@ class ExGetTransactionData extends BaseParser {
         hour,
         minute,
         second,
-        price: price / 1000, // TODO
+        price: parsePrice(price / 1000), // TODO
         volume,
         zengcang,
         nature,

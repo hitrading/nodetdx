@@ -9,6 +9,7 @@ const {
   getVolume,
   getPrice,
   findCSA,
+  parsePrice
 } = require('../helper');
 
 class GetSecurityQuotesCmd extends BaseParser {
@@ -195,7 +196,7 @@ class GetSecurityQuotesCmd extends BaseParser {
   setup() {}
 
   calcPrice(basePrice, diff) {
-    return (basePrice + diff) / 100
+    return parsePrice((basePrice + diff) / 100);
   }
 
   calcStartPosForEveryStock(bodyBuf) {

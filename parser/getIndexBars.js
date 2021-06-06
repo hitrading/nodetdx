@@ -38,6 +38,7 @@ const {
   getPrice,
   getDatetime,
   formatDatetime,
+  parsePrice
 } = require('../helper');
 
 class GetIndexBarsCmd extends BaseParser {
@@ -104,10 +105,10 @@ class GetIndexBarsCmd extends BaseParser {
       preDiffBase = priceOpenDiff + priceCloseDiff;
 
       klines.push({
-        open,
-        close,
-        high,
-        low,
+        open: parsePrice(open),
+        close: parsePrice(close),
+        high: parsePrice(high),
+        low: parsePrice(low),
         vol,
         dbvol,
         year,

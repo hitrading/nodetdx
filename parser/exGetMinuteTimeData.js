@@ -14,10 +14,11 @@
 
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-// const {
-//   bufferToBytes,
-//   bytesToBuffer,
-// } = require('../helper');
+const {
+  // bufferToBytes,
+  // bytesToBuffer,
+  parsePrice
+} = require('../helper');
 
 class ExGetMinuteTimeData extends BaseParser {
   setParams(market, code) {
@@ -40,8 +41,8 @@ class ExGetMinuteTimeData extends BaseParser {
       result.push({
         hour,
         minute,
-        price,
-        avgPrice,
+        price: parsePrice(price),
+        avgPrice: parsePrice(avgPrice),
         volume,
         openInterest
       });

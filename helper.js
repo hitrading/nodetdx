@@ -433,6 +433,10 @@ function fixDatetime(bar) {
   bar.datetime = tradeDate + ' ' + tradeTime;
 }
 
+function parsePrice(price, precision = 4) {
+  return typeof price === 'number' ? +price.toFixed(precision) : price;
+}
+
 module.exports = {
   hexToBytes,
   bytesToHex,
@@ -455,4 +459,5 @@ module.exports = {
   getMarketCode,
   isChanged,
   fixDatetime,
+  parsePrice,
 };

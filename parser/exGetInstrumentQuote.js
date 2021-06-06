@@ -54,10 +54,11 @@
 
 const bufferpack = require('bufferpack');
 const BaseParser = require('./base');
-// const {
-//   bufferToBytes,
-//   bytesToBuffer,
-// } = require('../helper');
+const {
+  // bufferToBytes,
+  // bytesToBuffer,
+  parsePrice
+} = require('../helper');
 
 
 class ExGetInstrumentQuote extends BaseParser {
@@ -90,32 +91,32 @@ class ExGetInstrumentQuote extends BaseParser {
     return {
       market,
       code: this.decode(code, 'gbk'),
-      preClose,
-      open,
-      high,
-      low,
-      lastPrice,
+      preClose: parsePrice(preClose),
+      open: parsePrice(open),
+      high: parsePrice(high),
+      low: parsePrice(low),
+      lastPrice: parsePrice(lastPrice),
       openingVol,
       totalVol,
       vol,
       inner,
       outer,
       openInterest,
-      bid1,
-      bid2,
-      bid3,
-      bid4,
-      bid5,
+      bid1: parsePrice(bid1),
+      bid2: parsePrice(bid2),
+      bid3: parsePrice(bid3),
+      bid4: parsePrice(bid4),
+      bid5: parsePrice(bid5),
       bidVol1,
       bidVol2,
       bidVol3,
       bidVol4,
       bidVol5,
-      ask1,
-      ask2,
-      ask3,
-      ask4,
-      ask5,
+      ask1: parsePrice(ask1),
+      ask2: parsePrice(ask2),
+      ask3: parsePrice(ask3),
+      ask4: parsePrice(ask4),
+      ask5: parsePrice(ask5),
       askVol1,
       askVol2,
       askVol3,

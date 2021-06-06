@@ -3,7 +3,8 @@ const BaseParser = require('./base');
 const {
   // bufferToBytes,
   // bytesToBuffer,
-  formatDatetime
+  formatDatetime,
+  parsePrice
 } = require('../helper');
 
 class ExGetHistoryInstrumentBarsRange extends BaseParser {
@@ -68,13 +69,13 @@ class ExGetHistoryInstrumentBarsRange extends BaseParser {
         day,
         hour,
         minute,
-        open,
-        high,
-        low,
-        close,
+        open: parsePrice(open),
+        high: parsePrice(high),
+        low: parsePrice(low),
+        close: parsePrice(close),
         openInterest,
         vol,
-        settlementPrice
+        settlementPrice: parsePrice(settlementPrice)
       });
     }
 

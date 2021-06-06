@@ -7,6 +7,7 @@ const {
   // bufferToBytes,
   // bytesToBuffer,
   getVolume,
+  parsePrice
 } = require('../helper');
 
 class GetSecurityList extends BaseParser {
@@ -41,7 +42,7 @@ class GetSecurityList extends BaseParser {
         volunit,
         decimalPoint,
         name,
-        preClose
+        preClose: parsePrice(preClose)
       });
     }
 
