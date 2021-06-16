@@ -22,6 +22,14 @@ const GetCompanyInfoContent = require('./parser/getCompanyInfoContent');
 
 const { marketHosts } = require('./config/hosts');
 const { parseSymbol, getMarketId, getPeriodValue, calcStartTimestamp, calcEndTimestamp } = require('./helper');
+
+let Worker;
+try {
+  const workerThreads = require('worker_threads');
+  Worker = workerThreads.Worker;
+}
+catch (e) {}
+
 const marketIds = ['SH', 'SZ'];
 class TdxMarketApi extends BaseSocketClient {
 
@@ -290,7 +298,16 @@ class TdxMarketApi extends BaseSocketClient {
       throw new Error('last argument of subscribe must be a function.');
     }
     
-    const child = childProcess.fork(path.join(__dirname, './hqChildProcess.js'), [ methodName, args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+    let child;
+    // 支持线程则使用线程
+    if (Worker) {
+      child = new Worker(path.join(__dirname, './hqWorker.js'));
+      child.postMessage([ methodName, args, this.host, this.port ]);
+    }
+    // 不支持线程则使用进程
+    else {
+      child = childProcess.fork(path.join(__dirname, './hqChildProcess.js'), [ methodName, args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+    }
     
     child.on('message', data => {
       callback(data);
@@ -310,8 +327,17 @@ class TdxMarketApi extends BaseSocketClient {
     if (typeof callback !== 'function') {
       throw new Error('last argument of subscribe must be a function.');
     }
-    
-    const child = childProcess.fork(path.join(__dirname, './subscribeQuotesChildProcess.js'), [ args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+
+    let child;
+    // 支持线程则使用线程
+    if (Worker) {
+      child = new Worker(path.join(__dirname, './subscribeQuotesWorker.js'));
+      child.postMessage([ args, this.host, this.port ]);
+    }
+    // 不支持线程则使用进程
+    else {
+      child = childProcess.fork(path.join(__dirname, './subscribeQuotesChildProcess.js'), [ args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+    }
     
     child.on('message', data => {
       callback(data);

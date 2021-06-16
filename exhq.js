@@ -16,6 +16,14 @@ const ExGetHistoryInstrumentBarsRange = require('./parser/exGetHistoryInstrument
 
 const { exMarketHosts } = require('./config/hosts');
 const { parseSymbol, getMarketId, getPeriodValue, getCategoryId, calcStartTimestamp, calcEndTimestamp, fixDatetime } = require('./helper');
+
+let Worker;
+try {
+  const workerThreads = require('worker_threads');
+  Worker = workerThreads.Worker;
+}
+catch (e) {}
+
 class TdxExMarketApi extends BaseSocketClient {
 
   doPing() {
@@ -188,7 +196,16 @@ class TdxExMarketApi extends BaseSocketClient {
       throw new Error('last argument of subscribe must be a function.');
     }
 
-    const child = childProcess.fork(path.join(__dirname, './exhqChildProcess.js'), [ methodName, args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+    let child;
+    // 支持线程则使用线程
+    if (Worker) {
+      child = new Worker(path.join(__dirname, './exhqWorker.js'));
+      child.postMessage([ methodName, args, this.host, this.port ]);
+    }
+    // 不支持线程则使用进程
+    else {
+      child = childProcess.fork(path.join(__dirname, './exhqChildProcess.js'), [ methodName, args, this.host, this.port ], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] });
+    }
     
     child.on('message', data => {
       callback(data);

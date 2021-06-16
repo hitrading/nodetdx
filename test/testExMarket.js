@@ -50,12 +50,12 @@ const api = new TdxExMarketApi({ heartbeatInterval: 5000, idleTimeout: 10000, us
     // });
     // api.getInstrumentInfo(10000, 98).then(data => console.log(data))
 
-    const bars = await api.findBars('1m', 'JL8.DCE', '2021-04-06 21:00:00', '2021-04-06 21:10:00'); // 上证指数
-    bars.forEach(bar => console.log(bar))
-    api.close();
-    // api.subscribe('getInstrumentBars', '1m', "i2105.DCE", (data) => {
-    //   console.log(data)
-    // });
+    // const bars = await api.findBars('1m', 'JL8.DCE', '2021-04-06 21:00:00', '2021-04-06 21:10:00'); // 上证指数
+    // bars.forEach(bar => console.log(bar))
+    // api.close();
+    api.subscribe('getInstrumentBars', '1m', "i2109.DCE", (data) => {
+      console.log(data)
+    });
     let st = Date.now();
 
     process.on('unhandledRejection', (e) => {
