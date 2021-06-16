@@ -346,6 +346,9 @@ Q   :  季
 Y   :  年
 ```
 
+## 版本说明
+v3.8.0 支持 `node 8.*.*` 环境, ** 不支持多线程 **
+v4.0.0 支持 `node 10` 以上环境, ** 支持多线程 **
 ## 其它
 本项目fork自[https://github.com/rainx/pytdx](https://github.com/rainx/pytdx)，在pytdx基础上修改而来，并修复了一些bug
 
