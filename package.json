@@ -1,6 +1,6 @@
 {
   "name": "nodetdx",
-  "version": "3.7.1",
+  "version": "3.8.0",
   "description": "a tdx interface implemention by pure nodejs",
   "main": "index.js",
   "author": "weilee",
@@ -8,7 +8,7 @@
   "dependencies": {
     "bufferpack": "0.0.6",
     "iconv-lite": "^0.6.2",
-    "promise-socket": "^7.0.0"
+    "promise-socket": "6.0.3"
   },
   "repository": "https://github.com/iamweilee/nodetdx.git"
 }
