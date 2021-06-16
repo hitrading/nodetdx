@@ -33,7 +33,6 @@ parentPort.on('message', async([args, host, port]) => {
   }
 });
 
-
 async function loopRequest(api, args) {
   const key = args.join(',');
   const data = await api.getSecurityQuotes(...args);

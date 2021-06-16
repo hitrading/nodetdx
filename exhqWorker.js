@@ -21,12 +21,6 @@ parentPort.on('message', async([methodName, args, host, port]) => {
   loopRequest(api, methodName, args);
 });
 
-
-
-(async() => {
-  
-})();
-
 async function loopRequest(api, methodName, args) {
   const key = args.join(',');
   const data = await api[methodName](...args);
