@@ -108,12 +108,12 @@ if (await api.connect()) {
 #### 1 : 获取股票行情
 可以获取**多**只股票的行情信息
 
-需要传入 股票代码 + '.' + 市场代码 构成的symbol， 可同时查询多个symbol的行情
+需要传入 市场代码 + '.' + 股票代码 构成的symbol， 可同时查询多个symbol的行情
 ```symbol1, symbol2, ..., symbolN```
 
 如：
 ```javascript
-await api.getSecurityQuotes('000001.SZ', '600300.SH')
+await api.getSecurityQuotes('SZ.000001', 'SH.600300')
 ```
 
 #### 2 : 获取k线
@@ -139,7 +139,7 @@ Y   :  年K线
 如： 
 
 ```javascript
-await api.getSecurityBars('D', '000001.SZ', 0, 100)
+await api.getSecurityBars('D', 'SZ.000001', 0, 100)
 ```
 
 #### 3 : 获取市场股票数量
@@ -176,58 +176,58 @@ Y   :  年K线
 如： 
 
 ```javascript
-await api.getIndexBars('D', '000001.SH', 1, 2)
+await api.getIndexBars('D', 'SH.000001', 1, 2)
 ```
 #### 6 : 查询分时行情
-参数：股票代码， 如： '000001.SZ' 或 '600300.SH'
+参数：股票代码， 如： 'SZ.000001' 或 'SH.600300'
 ```javascript
-await api.getMinuteTimeData('600300.SH')
+await api.getMinuteTimeData('SH.600300')
 ```
 #### 7 : 查询历史分时行情
-参数：股票代码，时间  如： '600300.SH', 20161209
+参数：股票代码，时间  如： 'SH.600300', 20161209
 ```javascript
-await api.getHistoryMinuteTimeData('600300.SH', 20161209)
+await api.getHistoryMinuteTimeData('SH.600300', 20161209)
 ```
 
 #### 8 : 查询分笔成交
 
-参数：股票代码，起始位置， 数量 如： 000001.SZ
+参数：股票代码，起始位置， 数量 如： SZ.000001
 ```javascript
-await api.getTransactionData('000001.SZ', 0, 30)
+await api.getTransactionData('SZ.000001', 0, 30)
 ```
 
 #### 9 : 查询历史分笔成交
 
-参数：股票代码，起始位置，日期 数量 如： '000001.SZ',0,10,20170209
+参数：股票代码，起始位置，日期 数量 如： 'SZ.000001',0,10,20170209
 
 ```javascript
-await api.getHistoryTransactionData('000001.SZ', 0, 10, 20170209)
+await api.getHistoryTransactionData('SZ.000001', 0, 10, 20170209)
 ```
 #### 10 : 查询公司信息目录
-参数：股票代码， 如： '000001.SZ'
+参数：股票代码， 如： 'SZ.000001'
 ```javascript
-await api.getCompanyInfoCategory('000001.SZ')
+await api.getCompanyInfoCategory('SZ.000001')
 ```
 
 #### 11 : 读取公司信息详情
 
-参数：股票代码, 文件名, 起始位置， 数量, 如：'000001.SZ','000001.txt',2054363,9221
+参数：股票代码, 文件名, 起始位置， 数量, 如：'SZ.000001','000001.txt',2054363,9221
 ```javascript
-await api.getCompanyInfoContent('000001.SZ', '000001.txt', 0, 10000)
+await api.getCompanyInfoContent('SZ.000001', '000001.txt', 0, 10000)
 ```
 
 注意这里的 起始位置， 数量 参考上面接口的返回结果。
 
 #### 12 : 读取除权除息信息
-参数：股票代码， 如： '600300.SH'
+参数：股票代码， 如： 'SH.600300'
 ```javascript
-await api.getExRightInfo('600300.SH')
+await api.getExRightInfo('SH.600300')
 ```
 
 #### 13 : 读取财务信息
-参数：股票代码， 如： '000001.SZ'
+参数：股票代码， 如： 'SZ.000001'
 ```javascript
-await api.getFinanceInfo('000001.SZ')
+await api.getFinanceInfo('SZ.000001')
 ```
 
 
@@ -253,7 +253,7 @@ Y   :  年K线
 如： 
 
 ```javascript
-await api.findBars('D', '000001.SH', '2021-03-02', '2021-03-06')
+await api.findBars('D', 'SH.000001', '2021-03-02', '2021-03-06')
 ```
 
 
@@ -265,7 +265,7 @@ await api.findBars('D', '000001.SH', '2021-03-02', '2021-03-06')
 **注：在不支持线程的node版本, 该函数会开子进程轮询, 为防止子进程耗尽资源应谨慎使用, 通常用于订阅行情和K线比较合适**
 
 ```javascript
-api.subscribe('getSecurityQuotes', '600519.SH', callback);
+api.subscribe('getSecurityQuotes', 'SH.600519', callback);
 ```
 
 #### 16 : 订阅行情（数据变化推送, 无变化不推送）
@@ -276,8 +276,8 @@ api.subscribe('getSecurityQuotes', '600519.SH', callback);
 **注：在不支持线程的node版本, 该函数会开子进程轮询, 为防止子进程耗尽资源应谨慎使用, 通常用于订阅行情和K线比较合适**
 
 ```javascript
-// 订阅'600519.SH', '000001.SH'的行情
-api.subscribeQuotes('600519.SH', '000001.SH', callback);
+// 订阅'SH.600519', 'SH.000001'的行情
+api.subscribeQuotes('SH.600519', 'SH.000001', callback);
 // 订阅全市场股票的行情
 api.subscribeQuotes(callback);
 ```

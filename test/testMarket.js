@@ -12,7 +12,7 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // do {
     //   list = await api.getSecurityList('SH', i++ * step);
     //   const l = list.filter(item => item.volunit === 100 && item.decimalPoint === 2 && /^6\d{5}$/.test(item.code));
-    //   l.forEach(item => item.code += '.SH');
+    //   l.forEach(item => item.code = 'SH.' + item.code);
     //   result.push(...l);
     // } while(list.length);
 
@@ -21,15 +21,15 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // do {
     //   list = await api.getSecurityList('SZ', i++ * step);
     //   const l = list.filter(item => item.volunit === 100 && item.decimalPoint === 2 && /^[03]\d{5}$/.test(item.code));
-    //   l.forEach(item => item.code += '.SZ');
+    //   l.forEach(item => item.code = 'SZ.' + item.code);
     //   result.push(...l);
     // } while(list.length);
     
     // let result = await api.findStockList();
     // console.info(result.length);
-    // const quotes = await api.getSecurityQuotes(['SZ.000001', '600300.SH', '000002.SZ', '000008.SZ', '000011.SZ', '000012.SZ', '000014.SZ', '000016.SZ', '000017.SZ', '002351.SZ', '600520.SH']);  // 84, 165, 246
-    // const quotes = await api.getSecurityQuotes(['600520.SH']);  // 84, 165, 246
-    // const quotes = await api.getSecurityQuotes('600520.SH');  // 84, 165, 246
+    // const quotes = await api.getSecurityQuotes(['SZ.000001', 'SH.600300', 'SZ.000002', 'SZ.000008', 'SZ.000011', 'SZ.000012', 'SZ.000014', 'SZ.000016', 'SZ.000017', 'SZ.002351', 'SH.600520']);  // 84, 165, 246
+    // const quotes = await api.getSecurityQuotes(['SH.600520']);  // 84, 165, 246
+    // const quotes = await api.getSecurityQuotes('SH.600520');  // 84, 165, 246
     // const stocks = result.map(item => item.symbol);
     // console.log('stocks.length', stocks.length);
     // let quotes;
@@ -55,7 +55,7 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // console.info(bars)
     // bars = await api.getSecurityBars('D', 'SZ.000001', 20, 10);
     // console.info(bars)
-    // const indexBars = await api.getIndexBars('D', '000001.SH', 0, 100);
+    // const indexBars = await api.getIndexBars('D', '000001', 0, 100);
     // console.info(indexBars);
     // const timeData = await api.getMinuteTimeData('SZ.000001');
     // console.info(timeData);
