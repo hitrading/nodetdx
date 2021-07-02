@@ -27,7 +27,7 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     
     // let result = await api.findStockList();
     // console.info(result.length);
-    // const quotes = await api.getSecurityQuotes(['000001.SZ', '600300.SH', '000002.SZ', '000008.SZ', '000011.SZ', '000012.SZ', '000014.SZ', '000016.SZ', '000017.SZ', '002351.SZ', '600520.SH']);  // 84, 165, 246
+    // const quotes = await api.getSecurityQuotes(['SZ.000001', '600300.SH', '000002.SZ', '000008.SZ', '000011.SZ', '000012.SZ', '000014.SZ', '000016.SZ', '000017.SZ', '002351.SZ', '600520.SH']);  // 84, 165, 246
     // const quotes = await api.getSecurityQuotes(['600520.SH']);  // 84, 165, 246
     // const quotes = await api.getSecurityQuotes('600520.SH');  // 84, 165, 246
     // const stocks = result.map(item => item.symbol);
@@ -45,31 +45,31 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // }
     
     // console.info('result.length', result.length)
-    // const financeInfo = await api.getFinanceInfo('000001.SZ');
+    // const financeInfo = await api.getFinanceInfo('SZ.000001');
     // console.info(financeInfo);
-    // const exRightInfo = await api.getExRightInfo('000001.SZ');
+    // const exRightInfo = await api.getExRightInfo('SZ.000001');
     // console.info(exRightInfo);
-    // let bars = await api.getSecurityBars('D', '000001.SZ', 0, 10);
+    // let bars = await api.getSecurityBars('D', 'SZ.000001', 0, 10);
     // console.info(bars)
-    // bars = await api.getSecurityBars('D', '000001.SZ', 10, 10);
+    // bars = await api.getSecurityBars('D', 'SZ.000001', 10, 10);
     // console.info(bars)
-    // bars = await api.getSecurityBars('D', '000001.SZ', 20, 10);
+    // bars = await api.getSecurityBars('D', 'SZ.000001', 20, 10);
     // console.info(bars)
     // const indexBars = await api.getIndexBars('D', '000001.SH', 0, 100);
     // console.info(indexBars);
-    // const timeData = await api.getMinuteTimeData('000001.SZ');
+    // const timeData = await api.getMinuteTimeData('SZ.000001');
     // console.info(timeData);
-    // const hisTimeData = await api.getHistoryMinuteTimeData('000001.SZ', 20161209)
+    // const hisTimeData = await api.getHistoryMinuteTimeData('SZ.000001', 20161209)
     // console.info(hisTimeData)
-    // const hisTransData = await api.getHistoryTransactionData('000001.SZ', 0, 10, 20170209)
+    // const hisTransData = await api.getHistoryTransactionData('SZ.000001', 0, 10, 20170209)
     // console.info(hisTransData)
-    // const transData = await api.getTransactionData('000001.SZ', 0, 10);
+    // const transData = await api.getTransactionData('SZ.000001', 0, 10);
     // console.info(transData)
-    // const companyCategory = await api.getCompanyInfoCategory('000001.SZ');
+    // const companyCategory = await api.getCompanyInfoCategory('SZ.000001');
     // console.info(companyCategory)
-    // const companyInfo = await api.getCompanyInfoContent('000001.SZ', '000001.txt', 0, 20000);
+    // const companyInfo = await api.getCompanyInfoContent('SZ.000001', '000001.txt', 0, 20000);
     // console.info(companyInfo);
-    // const bars = await api.findSecurityBars('D', '000001.SZ', '2021-02-19', '2021-02-26')
+    // const bars = await api.findSecurityBars('D', 'SZ.000001', '2021-02-19', '2021-02-26')
     // console.info(JSON.stringify(bars));
     // api.disconnect()
     // let c = 0;
@@ -77,7 +77,7 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // async function getSecurityQuotes () {
     //   c++;
     //   const t = Date.now();
-    //   const quotes = await api.getSecurityQuotes('600300.SH');
+    //   const quotes = await api.getSecurityQuotes('SH.600300');
     //   const { price, bid1, ask1, bidVol1, askVol1, serverTime } = quotes[0]
     //   console.info(JSON.stringify({
     //     price,
@@ -103,20 +103,20 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
 
     // getSecurityQuotes();
 
-    // api.getSecurityQuotes('600520.SH').then(quote => console.log(quote));
-    // api.getSecurityQuotes('600300.SH').then(quote => console.log(quote));
-    // api.getSecurityQuotes('000001.SZ').then(quote => console.log(quote));
+    // api.getSecurityQuotes('SH.600520').then(quote => console.log(quote));
+    // api.getSecurityQuotes('SH.600300').then(quote => console.log(quote));
+    // api.getSecurityQuotes('SZ.000001').then(quote => console.log(quote));
 
-    // api.findBars('D', '000001.SH', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 上证指数
-    // api.findBars('D', '000001.SZ', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 中国平安
+    // api.findBars('D', 'SH.000001', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 上证指数
+    // api.findBars('D', 'SZ.000001', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 中国平安
 
-    // api.subscribe('getSecurityQuotes', '600520.SH', (data) => {
+    // api.subscribe('getSecurityQuotes', 'SH.600520', (data) => {
     //   console.log(data)
     // });
 
-    api.subscribeQuotes('000001.SH', '000001.SZ', (data) => {
-      console.log(data)
-    });
+    // api.subscribeQuotes('SH.000001', 'SZ.000001', (data) => {
+    //   console.log(data)
+    // });
     // let st = Date.now();
 
     // process.on('unhandledRejection', (e) => {

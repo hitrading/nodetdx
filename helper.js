@@ -272,9 +272,9 @@ function parseSymbol(symbol) {
   const data = {};
 
   if (arr) {
-    data.code = arr[1].toUpperCase(); // 通达信扩展行情的期货合约品种字母必须全部为大写, 比如rb2105必须转换为RB2105
-    data.marketCode = arr[2];
-
+    data.marketCode = arr[1];
+    data.code = arr[2].toUpperCase(); // 通达信扩展行情的期货合约品种字母必须全部为大写, 比如rb2105必须转换为RB2105
+    
     if (arr[3]) {
       data.subType = arr[3];
     }
