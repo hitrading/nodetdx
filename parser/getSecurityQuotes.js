@@ -154,7 +154,7 @@ class GetSecurityQuotesCmd extends BaseParser {
         reversedBytes0, // : bytesToBuffer(reversedBytes0).readUInt32LE(0), // readUInt32BE
         reversedBytes1,
         totalVol,
-        vol,
+        volume: vol,
         amount,
         sellVol,
         buyVol,

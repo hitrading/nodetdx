@@ -98,7 +98,7 @@ class ExGetInstrumentQuote extends BaseParser {
       lastPrice: parsePrice(lastPrice),
       openingVol,
       totalVol,
-      vol,
+      volume: vol,
       inner,
       outer,
       openInterest,

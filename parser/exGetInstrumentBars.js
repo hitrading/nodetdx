@@ -67,7 +67,7 @@ class ExGetInstrumentBars extends BaseParser {
         low: parsePrice(low),
         close: parsePrice(close),
         openInterest,
-        vol, // 当查询的是日K线的时候这里的vol似乎需要乘100，但即使如此也不精确啊
+        volume: vol, // 当查询的是日K线的时候这里的vol似乎需要乘100，但即使如此也不精确啊
         settlementPrice: parsePrice(settlementPrice),
         year,
         month,

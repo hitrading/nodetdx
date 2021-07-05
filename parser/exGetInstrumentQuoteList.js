@@ -122,7 +122,7 @@ class ExGetInstrumentQuoteList extends BaseParser {
       lastPrice: parsePrice(lastPrice), // 现价
       buy: parsePrice(buy), // 买入价
       totalVol, // 总量
-      vol, // 现量
+      volume: vol, // 现量
       amount,
       inner,
       outer,
@@ -172,7 +172,7 @@ class ExGetInstrumentQuoteList extends BaseParser {
       sell: parsePrice(sell), // 卖出
       openingVol, // 开仓(量)
       totalVol,
-      vol,
+      volume: vol,
       amount,
       inner, // 内盘
       outer, // 外盘

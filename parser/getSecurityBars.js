@@ -97,7 +97,7 @@ class GetSecurityBarsCmd extends BaseParser {
         close: parsePrice(close),
         high: parsePrice(high),
         low: parsePrice(low),
-        vol,
+        volume: vol,
         dbvol,
         year,
         month,

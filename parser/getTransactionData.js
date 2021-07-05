@@ -45,7 +45,7 @@ class GetTransactionData extends BaseParser {
       ticks.push({
         time: padStart(hour, 2) + ':' + padStart(minute, 2), // "%02d:%02d" % (hour, minute)
         price: parsePrice(lastPrice / 100),
-        vol,
+        volume: vol,
         num,
         buyOrSell
       });

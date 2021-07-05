@@ -41,7 +41,7 @@ class GetHistoryMinuteTimeData extends BaseParser {
 
       prices.push({
         price: lastPrice / 100,
-        vol
+        volume: vol
       });
     }
     return prices;

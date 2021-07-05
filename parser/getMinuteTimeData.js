@@ -69,7 +69,7 @@ class GetMinuteTimeData extends BaseParser {
 
       prices.push({
         price: lastPrice / 100,
-        vol
+        volume: vol
       });
     }
 

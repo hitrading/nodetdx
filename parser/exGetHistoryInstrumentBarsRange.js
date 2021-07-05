@@ -74,7 +74,7 @@ class ExGetHistoryInstrumentBarsRange extends BaseParser {
         low: parsePrice(low),
         close: parsePrice(close),
         openInterest,
-        vol,
+        volume: vol,
         settlementPrice: parsePrice(settlementPrice)
       });
     }
