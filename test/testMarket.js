@@ -107,8 +107,8 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // api.getSecurityQuotes('SH.600300').then(quote => console.log(quote));
     // api.getSecurityQuotes('SZ.000001').then(quote => console.log(quote));
 
-    // api.findBars('D', 'SH.000001', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 上证指数
-    // api.findBars('D', 'SZ.000001', '2021-02-19', '2021-02-26').then(bars => console.log(JSON.stringify(bars))); // 中国平安
+    api.findBars('5m', 'SH.000001', '2021-02-19', null, 1000).then(bars => console.log(bars.length)); // 上证指数
+    api.findBars('5m', 'SZ.000001', null, '2021-02-26', 2000).then(bars => console.log(bars.length)); // 中国平安
 
     // api.subscribe('getSecurityQuotes', 'SH.600520', (data) => {
     //   console.log(data)

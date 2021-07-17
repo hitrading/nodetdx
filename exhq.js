@@ -135,15 +135,22 @@ class TdxExMarketApi extends BaseSocketClient {
    * @param {String} startDatetime
    * @param {String} endDatetime
    */
-  async findBars(period = 'D', symbol, startDatetime, endDatetime) {
+  async findBars(period = 'D', symbol, startDatetime, endDatetime, count) {
     // 具体详情参见 https://github.com/rainx/pytdx/issues/5
     // 具体详情参见 https://github.com/rainx/pytdx/issues/21
 
     // https://github.com/rainx/pytdx/issues/33
     // 0 - 深圳， 1 - 上海
 
-    const startTimestamp = calcStartTimestamp(startDatetime);
-    const endTimestamp = calcEndTimestamp(endDatetime);
+    let startTimestamp, endTimestamp;
+
+    if (startDatetime) {
+      startTimestamp = calcStartTimestamp(startDatetime);
+    }
+
+    if (endDatetime) {
+      endTimestamp = calcEndTimestamp(endDatetime);
+    }
 
     let bars = [];
     let i = 0;
@@ -160,20 +167,42 @@ class TdxExMarketApi extends BaseSocketClient {
         const firstTimestamp = new Date(firstBar.datetime).getTime();
         const lastTimestamp = new Date(lastBar.datetime).getTime();
 
-        if (firstTimestamp >= endTimestamp) {
+        if (endTimestamp && firstTimestamp >= endTimestamp) {
           continue;
         }
 
-        if (startTimestamp > lastTimestamp) {
+        if (startTimestamp && startTimestamp > lastTimestamp) {
           break;
         }
 
         list = list.filter(bar => {
           const timestamp = new Date(bar.datetime).getTime();
-          return timestamp >= startTimestamp && timestamp <= endTimestamp;
+          if (startTimestamp && endTimestamp) {
+            return timestamp >= startTimestamp && timestamp <= endTimestamp;
+          }
+          else if (startTimestamp) {
+            return timestamp >= startTimestamp;
+          }
+          else if (endTimestamp) {
+            return timestamp <= endTimestamp;
+          }
         });
         bars = list.concat(bars);
+
+        if (!startTimestamp && endTimestamp && count && count > 0 && bars.length >= count) {
+          break;
+        }
       }
+    }
+
+    if (startTimestamp && endTimestamp) {
+      return count && count > 0 ? bars.slice(0, count) : bars;
+    }
+    else if (startTimestamp) {
+      return count && count > 0 ? bars.slice(0, count) : bars;
+    }
+    else if (endTimestamp) {
+      return count && count > 0 ? bars.slice(-count) : bars;
     }
 
     return bars;

@@ -166,21 +166,33 @@ class TdxMarketApi extends BaseSocketClient {
   }
 
   /**
-   * 按日期查询证券K线
+   * 按日期查询count根证券K线
+   * 若有startDatetime、count 且无 endDatetime, 则返回startDatetime之后的count根K线
+   * 若有endDatetime、count 且无 startDatetime, 则返回endDatetime之前的count根K线
+   * 若有startDatetime、endDatetime 且无 count, 则返回startDatetime和endDatetime之间的K线
+   * 若有startDatetime 且无 endDatetime、count, 则返回startDatetime到当前时间之间的K线
    * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
    * @param {String} symbol
    * @param {String} startDatetime
    * @param {String} endDatetime
+   * @param {Integer} count
    */
-  async findSecurityBars(period = 'D', symbol, startDatetime, endDatetime) {
+  async findSecurityBars(period = 'D', symbol, startDatetime, endDatetime, count) {
     // 具体详情参见 https://github.com/rainx/pytdx/issues/5
     // 具体详情参见 https://github.com/rainx/pytdx/issues/21
 
     // https://github.com/rainx/pytdx/issues/33
     // 0 - 深圳， 1 - 上海
 
-    const startTimestamp = calcStartTimestamp(startDatetime);
-    const endTimestamp = calcEndTimestamp(endDatetime);
+    let startTimestamp, endTimestamp;
+
+    if (startDatetime) {
+      startTimestamp = calcStartTimestamp(startDatetime);
+    }
+
+    if (endDatetime) {
+      endTimestamp = calcEndTimestamp(endDatetime);
+    }
 
     let bars = [];
     let i = 0;
@@ -197,46 +209,80 @@ class TdxMarketApi extends BaseSocketClient {
         const firstTimestamp = new Date(firstBar.datetime).getTime();
         const lastTimestamp = new Date(lastBar.datetime).getTime();
 
-        if (firstTimestamp >= endTimestamp) {
+        if (endTimestamp && firstTimestamp >= endTimestamp) {
           continue;
         }
 
-        if (startTimestamp > lastTimestamp) {
+        if (startTimestamp && startTimestamp > lastTimestamp) {
           break;
         }
 
         list = list.filter(bar => {
           const timestamp = new Date(bar.datetime).getTime();
-          return timestamp >= startTimestamp && timestamp <= endTimestamp;
+          if (startTimestamp && endTimestamp) {
+            return timestamp >= startTimestamp && timestamp <= endTimestamp;
+          }
+          else if (startTimestamp) {
+            return timestamp >= startTimestamp;
+          }
+          else if (endTimestamp) {
+            return timestamp <= endTimestamp;
+          }
         });
         bars = list.concat(bars);
+
+        if (!startTimestamp && endTimestamp && count && count > 0 && bars.length >= count) {
+          break;
+        }
       }
+    }
+
+    if (startTimestamp && endTimestamp) {
+      return count && count > 0 ? bars.slice(0, count) : bars;
+    }
+    else if (startTimestamp) {
+      return count && count > 0 ? bars.slice(0, count) : bars;
+    }
+    else if (endTimestamp) {
+      return count && count > 0 ? bars.slice(-count) : bars;
     }
 
     return bars;
   }
 
   /**
-   * 按日期查询指数K线
+   * 按日期查询count根指数K线
+   * 若有startDatetime、count 且无 endDatetime, 则返回startDatetime之后的count根K线
+   * 若有endDatetime、count 且无 startDatetime, 则返回endDatetime之前的count根K线
+   * 若有startDatetime、endDatetime 且无 count, 则返回startDatetime和endDatetime之间的K线
+   * 若有startDatetime 且无 endDatetime、count, 则返回startDatetime到当前时间之间的K线
    * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
    * @param {String} symbol
    * @param {String} startDatetime
    * @param {String} endDatetime
+   * @param {Integer} count
    */
-  async findIndexBars(period = 'D', symbol, startDatetime, endDatetime) {
+  async findIndexBars(period = 'D', symbol, startDatetime, endDatetime, count) {
     // 具体详情参见 https://github.com/rainx/pytdx/issues/5
     // 具体详情参见 https://github.com/rainx/pytdx/issues/21
 
     // https://github.com/rainx/pytdx/issues/33
     // 0 - 深圳， 1 - 上海
 
-    const startTimestamp = calcStartTimestamp(startDatetime);
-    const endTimestamp = calcEndTimestamp(endDatetime);
+    let startTimestamp, endTimestamp;
+
+    if (startDatetime) {
+      startTimestamp = calcStartTimestamp(startDatetime);
+    }
+
+    if (endDatetime) {
+      endTimestamp = calcEndTimestamp(endDatetime);
+    }
 
     let bars = [];
     let i = 0;
     while(true) {
-      let list = await this.getIndexBars(period, symbol, i++ * 800, 800); // i++ * 8 => i * 8; i++;
+      let list = await this.getIndexBars(period, symbol, i++ * 700, 700); // i++ * 8 => i * 8; i++;
 
       if (!list || !list.length) {
         break;
@@ -248,37 +294,64 @@ class TdxMarketApi extends BaseSocketClient {
         const firstTimestamp = new Date(firstBar.datetime).getTime();
         const lastTimestamp = new Date(lastBar.datetime).getTime();
 
-        if (firstTimestamp >= endTimestamp) {
+        if (endTimestamp && firstTimestamp >= endTimestamp) {
           continue;
         }
 
-        if (startTimestamp > lastTimestamp) {
+        if (startTimestamp && startTimestamp > lastTimestamp) {
           break;
         }
 
         list = list.filter(bar => {
           const timestamp = new Date(bar.datetime).getTime();
-          return timestamp >= startTimestamp && timestamp <= endTimestamp;
+          if (startTimestamp && endTimestamp) {
+            return timestamp >= startTimestamp && timestamp <= endTimestamp;
+          }
+          else if (startTimestamp) {
+            return timestamp >= startTimestamp;
+          }
+          else if (endTimestamp) {
+            return timestamp <= endTimestamp;
+          }
         });
         bars = list.concat(bars);
+
+        if (!startTimestamp && endTimestamp && count && count > 0 && bars.length >= count) {
+          break;
+        }
       }
+    }
+
+    if (startTimestamp && endTimestamp) {
+      return count && count > 0 ? bars.slice(0, count) : bars;
+    }
+    else if (startTimestamp) {
+      return count && count > 0 ? bars.slice(0, count) : bars;
+    }
+    else if (endTimestamp) {
+      return count && count > 0 ? bars.slice(-count) : bars;
     }
 
     return bars;
   }
 
   /**
-   * 按日期查询K线
+   * 按日期查询count根K线
+   * 若有startDatetime、count 且无 endDatetime, 则返回startDatetime之后的count根K线
+   * 若有endDatetime、count 且无 startDatetime, 则返回endDatetime之前的count根K线
+   * 若有startDatetime、endDatetime 且无 count, 则返回startDatetime和endDatetime之间的K线
+   * 若有startDatetime 且无 endDatetime、count, 则返回startDatetime到当前时间之间的K线
    * 不再区分是指数还是股票, 由程序解析symbol来自动区分, 对调用者屏蔽差异
    * 注: 这里有个问题 因为tdx的官网的最大显示就是24000条 所以1min和5min数据 最多只能取24000条左右 这个没法再多了 其他的没啥影响
    * @param {String} period 1m, 15m, 30m, H, D, W, M, Q, Y
    * @param {String} symbol
    * @param {String} startDatetime
    * @param {String} endDatetime
+   * @param {Integer} count
    */
-  findBars(period = 'D', symbol, startDatetime, endDatetime) {
+  findBars(period = 'D', symbol, startDatetime, endDatetime, count) {
     const { isIndex } = parseSymbol(symbol);
-    return isIndex ? this.findIndexBars(period, symbol, startDatetime, endDatetime) : this.findSecurityBars(period, symbol, startDatetime, endDatetime);
+    return isIndex ? this.findIndexBars(period, symbol, startDatetime, endDatetime, count) : this.findSecurityBars(period, symbol, startDatetime, endDatetime, count);
   }
 
   /**
