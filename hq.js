@@ -434,7 +434,7 @@ class TdxMarketApi extends BaseSocketClient {
         tmpList = await this.getSecurityList(marketId, i++ * step);
         tmpList.forEach(item => {
           if (reg.test(item.code)) {
-            item.symbol = item.code + '.' + marketId;
+            item.symbol = marketId + '.' + item.code;
             list.push(item);
           }
         });
