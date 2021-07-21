@@ -25,8 +25,8 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     //   result.push(...l);
     // } while(list.length);
     
-    // let result = await api.findStockList();
-    // console.info(result.length);
+    let result = await api.findStockList();
+    console.info(result.length);
     // const quotes = await api.getSecurityQuotes(['SZ.000001', 'SH.600300', 'SZ.000002', 'SZ.000008', 'SZ.000011', 'SZ.000012', 'SZ.000014', 'SZ.000016', 'SZ.000017', 'SZ.002351', 'SH.600520']);  // 84, 165, 246
     // const quotes = await api.getSecurityQuotes(['SH.600520']);  // 84, 165, 246
     // const quotes = await api.getSecurityQuotes('SH.600520');  // 84, 165, 246
