@@ -26,7 +26,14 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // } while(list.length);
     
     let result = await api.findStockList();
-    console.info(result.length);
+    // console.log(result.filter(item => /^688/.test(item.code)))
+    console.log(result.length);
+    // result.forEach(item => {
+    //   // console.log(item)
+    //   if (item.name.indexOf('XD') !== -1 || item.name.indexOf('xd') !== -1) {
+    //     console.log(item)
+    //   }
+    // })
     // const quotes = await api.getSecurityQuotes(['SZ.000001', 'SH.600300', 'SZ.000002', 'SZ.000008', 'SZ.000011', 'SZ.000012', 'SZ.000014', 'SZ.000016', 'SZ.000017', 'SZ.002351', 'SH.600520']);  // 84, 165, 246
     // const quotes = await api.getSecurityQuotes(['SH.600520']);  // 84, 165, 246
     // const quotes = await api.getSecurityQuotes('SH.600520');  // 84, 165, 246
@@ -45,11 +52,11 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     // }
     
     // console.info('result.length', result.length)
-    // const financeInfo = await api.getFinanceInfo('SZ.000001');
+    // const financeInfo = await api.getFinanceInfo('SZ.300706');
     // console.info(financeInfo);
-    // const exRightInfo = await api.getExRightInfo('SZ.000001');
+    // const exRightInfo = await api.getExRightInfo('SZ.300706');
     // console.info(exRightInfo);
-    // let bars = await api.getSecurityBars('D', 'SZ.000001', 0, 10);
+    // let bars = await api.getSecurityBars('D', 'SZ.300706', 0, 5);
     // console.info(bars)
     // bars = await api.getSecurityBars('D', 'SZ.000001', 10, 10);
     // console.info(bars)
@@ -103,12 +110,12 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
 
     // getSecurityQuotes();
 
-    // api.getSecurityQuotes('SH.600520').then(quote => console.log(quote));
+    // api.getSecurityQuotes('SH.603083').then(quote => console.log(quote));
     // api.getSecurityQuotes('SH.600300').then(quote => console.log(quote));
     // api.getSecurityQuotes('SZ.000001').then(quote => console.log(quote));
 
-    api.findBars('5m', 'SH.000001', '2021-02-19', null, 1000).then(bars => console.log(bars.length)); // 上证指数
-    api.findBars('5m', 'SZ.000001', null, '2021-02-26', 2000).then(bars => console.log(bars.length)); // 中国平安
+    // api.findBars('5m', 'SH.000001', '2021-02-19', null, 1000).then(bars => console.log(bars.length)); // 上证指数
+    // api.findBars('5m', 'SZ.000001', null, '2021-02-26', 2000).then(bars => console.log(bars.length)); // 中国平安
 
     // api.subscribe('getSecurityQuotes', 'SH.600520', (data) => {
     //   console.log(data)
