@@ -7,12 +7,14 @@ const {
   bytesToBuffer,
 } = require('../helper');
 
-class SocketClientNotReady extends Error {} // { constructor(...args) { super(...args) } }
-class SendPkgNotReady extends Error {}
-class SendRequestPkgFails extends Error {}
-class ResponseHeaderRecvFails extends Error {}
-class ResponseRecvFails extends Error {}
-class MethodNotImplemented extends Error {}
+const {
+  SocketClientNotReady,
+  SendPkgNotReady,
+  SendRequestPkgFails,
+  ResponseHeaderRecvFails,
+  ResponseRecvFails,
+  MethodNotImplemented,
+} = require('../errors');
 
 const RSP_HEADER_LEN = 0x10;
 
@@ -55,8 +57,8 @@ class BaseParser {
       await this.client.write(this.sendPkg);
     }
     catch(e) {
-      logger.error(new SendRequestPkgFails('send fails: ' + e.stack));
-      throw e;
+      logger.error('send fails: ' + e.stack);
+      throw new SendRequestPkgFails('send fails: ' + e.stack);
     }
 
     // let nSended = this.client.socket.bytesWritten; // bytesRead
@@ -70,9 +72,10 @@ class BaseParser {
     // logger.debug('send package:', this.sendPkg);
 
     const headBuf = await this.client.read(this.rspHeaderLen);
-    logger.debug('recv headBuf', headBuf, '|len is :', headBuf.length);
 
-    if (headBuf.length === this.rspHeaderLen) {
+    headBuf && logger.debug('recv headBuf', headBuf, '|len is :', headBuf.length);
+
+    if (headBuf && headBuf.length === this.rspHeaderLen) {
       const [ , , , zipSize, unzipSize ] = bufferpack.unpack('<IIIHH', headBuf); // _, _, _, zipSize, unzipSize = struct.unpack("<IIIHH", headBuf)
       logger.debug('zip size is: ', zipSize);
       let bodyBuf = [], buf; // bodyBuf = bytearray()
@@ -120,7 +123,7 @@ class BaseParser {
       return parsedData;
     }
     else {
-      logger.debug('headBuf is not 0x10');
+      logger.error('headBuf is not 0x10');
       throw new ResponseHeaderRecvFails('headBuf is not 0x10');
     }
   }

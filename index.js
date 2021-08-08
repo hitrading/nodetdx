@@ -5,6 +5,15 @@ const {
   getMarketCode
 } = require('./helper');
 
+const {
+  SocketClientNotReady,
+  SendPkgNotReady,
+  SendRequestPkgFails,
+  ResponseHeaderRecvFails,
+  ResponseRecvFails,
+  MethodNotImplemented,
+} = require('./errors');
+
 const TdxMarketApi = require('./hq');
 const TdxExMarketApi = require('./exhq');
 const logger = require('./log');
@@ -24,4 +33,10 @@ module.exports = {
   },
   marketHosts,
   exMarketHosts,
+  SocketClientNotReady,
+  SendPkgNotReady,
+  SendRequestPkgFails,
+  ResponseHeaderRecvFails,
+  ResponseRecvFails,
+  MethodNotImplemented,
 };
