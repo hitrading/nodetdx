@@ -71,9 +71,15 @@ class BaseParser {
 
     // logger.debug('send package:', this.sendPkg);
 
-    const headBuf = await this.client.read(this.rspHeaderLen);
-
-    headBuf && logger.debug('recv headBuf', headBuf, '|len is :', headBuf.length);
+    let headBuf;
+    try {
+      headBuf = await this.client.read(this.rspHeaderLen);
+      headBuf && logger.debug('recv headBuf', headBuf, '|len is :', headBuf.length);
+    }
+    catch (e) {
+      logger.error('read header fails:' + e.stack);
+      throw new ResponseHeaderRecvFails('read header fails:' + e.stack)
+    }
 
     if (headBuf && headBuf.length === this.rspHeaderLen) {
       const [ , , , zipSize, unzipSize ] = bufferpack.unpack('<IIIHH', headBuf); // _, _, _, zipSize, unzipSize = struct.unpack("<IIIHH", headBuf)
