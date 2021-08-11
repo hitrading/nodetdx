@@ -249,11 +249,11 @@ Object.getOwnPropertyNames(TdxExMarketApi.prototype).forEach(name => {
   const property = TdxExMarketApi.prototype[name];
   if (typeof property === 'function' && /^get/.test(name)) {
     TdxExMarketApi.prototype[name] = new Proxy(
-      TdxExMarketApi.prototype[name],
+      property,
       {
         apply (target, thisArg, argumentsList) {
-          return new Promise((resolve) => {
-            thisArg.reqQueue.push([resolve, target, thisArg, argumentsList]);
+          return new Promise((resolve, reject) => {
+            thisArg.reqQueue.push([resolve, reject, target, thisArg, argumentsList]);
             thisArg.checkQueue();
           });
         }

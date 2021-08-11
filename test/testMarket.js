@@ -25,9 +25,9 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     //   result.push(...l);
     // } while(list.length);
     
-    let result = await api.findStockList();
+    // let result = await api.findStockList();
     // console.log(result.filter(item => /^688/.test(item.code)))
-    console.log(result.length);
+    // console.log(result.length);
     // result.forEach(item => {
     //   // console.log(item)
     //   if (item.name.indexOf('XD') !== -1 || item.name.indexOf('xd') !== -1) {
@@ -121,9 +121,10 @@ const api = new TdxMarketApi({ heartbeatInterval: 30000, idleTimeout: 60000 });
     //   console.log(data)
     // });
 
-    // api.subscribeQuotes('SH.000001', 'SZ.000001', (data) => {
-    //   console.log(data)
-    // });
+    api.subscribeQuotes('SH.600031', 'SH.000001', (data) => {
+      const [k1, k2] = data;
+      console.log(`${k1.code} ${k1.lastPrice} - ${k2.code} ${k2.lastPrice}`)
+    });
     // let st = Date.now();
 
     // process.on('unhandledRejection', (e) => {

@@ -201,14 +201,24 @@ class BaseSocketClient {
     const firstReq = this.reqQueue[0];
     if (firstReq && !this.lock) {
       this.lock = true;
-      const [resolve, target, thisArg, argumentsList] = firstReq;
-      const data = await target.apply(thisArg, argumentsList);
-      this.reqQueue.shift();
-      Promise.resolve().then(() => {
-        this.lock = false;
-        return this.checkQueue();
-      });
-      resolve(data);
+      const [resolve, reject, target, thisArg, argumentsList] = firstReq;
+      this.client.lastAckTime = Date.now(); // 更新 ack time
+      try {
+        this.reqQueue.shift();
+        const data = await target.apply(thisArg, argumentsList);
+        Promise.resolve().then(() => {
+          this.lock = false;
+          return this.checkQueue();
+        });
+        resolve(data);
+      }
+      catch(e) {
+        Promise.resolve().then(() => {
+          this.lock = false;
+          return this.checkQueue();
+        });
+        reject(e);
+      }
     }
   }
 
